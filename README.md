@@ -10,49 +10,7 @@
 
 ---
 
-### Setting up venv in Py:
+## Documentations:
 
-1. command to make a venv named `venv`:
-
-```
-python3 -m venv <name>
-```
-
-or use uv (ultra fast py pkg manager)
-
-```
-uv venv
-```
-
-- "venv" is a general practice name for all venvs
-- should create a folder with the name "venv"
-
-2. Activate the venv:
-
-```
-source venv/bin/activate
-```
-
-- we should something like this in your terminal prompt:
-
-```
-> (venv)
-```
-
-3. Install our dependencies
-
-```
-pip install fastapi uvicorn
-```
-
-- `uvicorn` is the ASGI server commonly used to run FastAPI apps.
-
-4. (Optional) Freeze Dependencies
-
-- This creates a requirements.txt file which can be used to recreate the venv for another machine or cloud
-
-```
-pip freeze > requirements.txt
-```
-
----
+- Please visit the [FastAPI Documentations](https://fastapi.tiangolo.com/tutorial/first-steps/#what-is-openapi-for) Page.
+- It literally has everything, from setting up venvs to everything to write robost APIs in pyhton
