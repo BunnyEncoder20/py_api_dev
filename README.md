@@ -14,3 +14,10 @@
 
 - Please visit the [FastAPI Documentations](https://fastapi.tiangolo.com/tutorial/first-steps/#what-is-openapi-for) Page.
 - It literally has everything, from setting up venvs to everything to write robost APIs in pyhton
+
+---
+
+### Backend API Dev
+
+- Backend api dev, is just making a bunch of path operations
+  ![alt text](image.png)
