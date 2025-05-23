@@ -40,7 +40,7 @@ def get_posts() -> List:
         "data": posts_db
     }
 
-@app.post("/v1/api/post")
+@app.post("/v1/api/post", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
 def make_post(post: Post_schema) -> dict:
     '''create a new post'''
     
@@ -58,6 +58,8 @@ def make_post(post: Post_schema) -> dict:
 # using path parameters
 @app.get("/v1/api/post/{id}")
 def get_specific_post(id: int):
+    '''get a specific post'''
+    
     print(f"[Server] Request for fecthing post [{id}]")
     
     req_post = None
