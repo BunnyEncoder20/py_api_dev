@@ -4,6 +4,7 @@ from fastapi.params import Body
 from pydantic import BaseModel
 
 from typing import List
+from random import randint
 '''-------------------------'''
 
 
@@ -18,30 +19,53 @@ class Post_schema(BaseModel):
     body: str
     tags: List = []
 
+# temp database
+posts_db = [
+    {"_id":1001, "title":"First lines of code", "content":"Hello World", "tags":["#coding", "#projects"]},
+    {"_id":1002, "title":"Best food of Humanity", "content":"Pizza *drops mike.", "tags":["#pizza4life", "#italian", "#🤌", "#Mamamia"]},
+]
+
 
 
 # Path operation (routes)
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"msg": "Hellow World"}
 
 @app.get("/v1/api/posts")
-def get_posts():
+def get_posts() -> List:
+    '''get all posts'''
+    
     return {
-        "postsList": [
-            {"p1": "post 1"},
-            {"p2": "post 2"},
-            {"p3": "post 3"},
-        ]
+        "data": posts_db
     }
 
 @app.post("/v1/api/post")
 def make_post(post: Post_schema) -> dict:
-    print(post)
+    '''create a new post'''
+    
+    post_data = post.dict()     # converting from pydantic schema to dict
+    post_data["_id"] = randint(1,1000000)
+    print(f"[Server] Creating post : {post_data}")
+    posts_db.append(post_data)
     return {
         "success": True,
-        "msg": f'Successfully created post',
-        "post_title": post.title,
-        "post_body": post.body,
-        "tags": post.tags
+        "msg": "Post published successfully",
+        "data": post_data
+    }
+
+
+# using path parameters
+@app.get("/v1/api/post/{id}")
+def get_specific_post(id: int):
+    print(f"[Server] Request for fecthing post [{id}]")
+    req_post = None
+    for post in posts_db:
+        if post["_id"] == id:
+            req_post = post
+            break
+    return {
+        "success": True if req_post else False,
+        "msg": "Post published successfully" if req_post else "Post not found",
+        "data": req_post
     }
