@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from typing import List
+from typing import List, Optional
 from random import randint
 '''-------------------------'''
 
@@ -19,10 +19,11 @@ class Post_Model(BaseModel):
     body: str
     tags: List = []
 
+# Pydantic Model for Standardized responses
 class Response_Model(BaseModel):
     status_code: int
-    msg: str = ""
-    data: dict = {}
+    msg: Optional[str] = Field(default=None, description="Optional message string")
+    data: Optional[dict] = Field(default=None, description="Optional data payload")
     
 
 # temp database
