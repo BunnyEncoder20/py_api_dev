@@ -15,6 +15,7 @@ app = FastAPI()
 
 # Pydantic Model for Validation
 class Post_Model(BaseModel):
+    # _id: int
     title: str
     body: str
     tags: List = []
@@ -99,7 +100,7 @@ def delete_post(pid: int):
     
     if not deleted:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The post with id:{pid} does not exist"
         )
     
@@ -111,4 +112,27 @@ def delete_post(pid: int):
         "data": deleted
     }
     
-            
+@app.put("/v1/api/updatepost/{pid}", response_model=Response_Model)
+def udpate_post(pid: int, ppost: Post_Model):
+    req_post_idx = None
+    for i, post in enumerate(posts_db):
+        if post["_id"] == pid:
+            req_post_idx = i
+            break
+    
+    # the post to be updated is not found
+    if not req_post_idx:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id:{pid} does not exist"
+        )
+    
+    # Update post data
+    updated_post = ppost.dict()
+    updated_post["_id"] = pid
+    posts_db[req_post_idx] = updated_post
+    return {
+        "status_code": status.HTTP_200_OK,
+        "msg": f"post {pid} was updated successfully",
+        "data": updated_post
+    }
