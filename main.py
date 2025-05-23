@@ -14,10 +14,16 @@ app = FastAPI()
 
 
 # Pydantic Model for Validation
-class Post_schema(BaseModel):
+class Post_Model(BaseModel):
     title: str
     body: str
     tags: List = []
+
+class Response_Model(BaseModel):
+    status_code: int
+    msg: str = ""
+    data: dict = {}
+    
 
 # temp database
 posts_db = [
@@ -28,9 +34,9 @@ posts_db = [
 
 
 # Path operation (routes)
-@app.get("/")
+@app.get("/", response_model=Response_Model)
 async def root():
-    return {"msg": "Hellow World"}
+    return {"status_code": status.HTTP_200_OK , "msg": "Hellow World"}
 
 @app.get("/v1/api/posts")
 def get_posts() -> List:
@@ -41,7 +47,7 @@ def get_posts() -> List:
     }
 
 @app.post("/v1/api/post", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
-def make_post(post: Post_schema) -> dict:
+def make_post(post: Post_Model) -> dict:
     '''create a new post'''
     
     post_data = post.dict()     # converting from pydantic schema to dict
@@ -78,14 +84,14 @@ def get_specific_post(id: int):
         "data": req_post
     }
 
-@app.delete("/v1/api/delpost/{pid}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/v1/api/delpost/{pid}")
 def delete_post(pid: int):
     
     deleted = None
     for i, post in enumerate(posts_db):
         if post["_id"] == pid:
             deleted = post
-            post_db.pop(i)
+            posts_db.pop(i)
             break
     
     if not deleted:
@@ -95,9 +101,9 @@ def delete_post(pid: int):
         )
     
     # with status code of 203, we cannot send anything back using return dict
-    # hence we send a Response 
-    return Response (
-        status_code=status_code,
-        detail="Post was successfully deleted"
-    )
+    # hence we send a Response item, but otherwise, send a normal return dict
+    return {
+        
+    }
+    
             
