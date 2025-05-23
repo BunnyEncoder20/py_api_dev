@@ -39,10 +39,12 @@ async def root():
     return {"status_code": status.HTTP_200_OK , "msg": "Hellow World"}
 
 @app.get("/v1/api/posts")
-def get_posts() -> List:
+def get_posts():
     '''get all posts'''
     
     return {
+        "status_code": status.HTTP_200_OK,
+        "msg": "Listing of all posts",
         "data": posts_db
     }
 
@@ -55,7 +57,7 @@ def make_post(post: Post_Model) -> dict:
     print(f"[Server] Creating post : {post_data}")
     posts_db.append(post_data)
     return {
-        "success": True,
+        "status_code": status.HTTP_200_OK,
         "msg": "Post published successfully",
         "data": post_data
     }
@@ -79,12 +81,12 @@ def get_specific_post(id: int):
         )
     
     return {
-        "Status Code": status.HTTP_200_OK ,
+        "status_code": status.HTTP_200_OK ,
         "msg": "Post published successfully",
         "data": req_post
     }
 
-@app.delete("/v1/api/delpost/{pid}")
+@app.delete("/v1/api/delpost/{pid}", response_model=Response_Model) # specifying response model for standardized reponses
 def delete_post(pid: int):
     
     deleted = None
@@ -103,7 +105,9 @@ def delete_post(pid: int):
     # with status code of 203, we cannot send anything back using return dict
     # hence we send a Response item, but otherwise, send a normal return dict
     return {
-        
+        "status_code": status.HTTP_200_OK,
+        "msg": f"post {pid} was deleted successfully",
+        "data": deleted
     }
     
             
