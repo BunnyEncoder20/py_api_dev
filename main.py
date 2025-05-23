@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, status, HTTPException
 from fastapi.params import Body
 
 from pydantic import BaseModel
@@ -57,17 +57,23 @@ def make_post(post: Post_schema) -> dict:
 
 # using path parameters
 @app.get("/v1/api/post/{id}")
-def get_specific_post(id: int, res: Response):
+def get_specific_post(id: int):
     print(f"[Server] Request for fecthing post [{id}]")
+    
     req_post = None
-    res.status_code = status.HTTP_404_NOT_FOUND
     for post in posts_db:
         if post["_id"] == id:
             req_post = post
-            res.status_code = status.HTTP_200_OK
             break
+    
+    if not req_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post {id} could not be found"
+        )
+    
     return {
-        "Status Code": res.status_code ,
-        "msg": "Post published successfully" if req_post else "Post not found",
+        "Status Code": status.HTTP_200_OK ,
+        "msg": "Post published successfully",
         "data": req_post
     }
