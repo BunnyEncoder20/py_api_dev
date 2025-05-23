@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 
 from pydantic import BaseModel
@@ -58,8 +58,6 @@ def make_post(post: Post_schema) -> dict:
 # using path parameters
 @app.get("/v1/api/post/{id}")
 def get_specific_post(id: int):
-    '''get a specific post'''
-    
     print(f"[Server] Request for fecthing post [{id}]")
     
     req_post = None
@@ -79,3 +77,27 @@ def get_specific_post(id: int):
         "msg": "Post published successfully",
         "data": req_post
     }
+
+@app.delete("/v1/api/delpost/{pid}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(pid: int):
+    
+    deleted = None
+    for i, post in enumerate(posts_db):
+        if post["_id"] == pid:
+            deleted = post
+            post_db.pop(i)
+            break
+    
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The post with id:{pid} does not exist"
+        )
+    
+    # with status code of 203, we cannot send anything back using return dict
+    # hence we send a Response 
+    return Response (
+        status_code=status_code,
+        detail="Post was successfully deleted"
+    )
+            
