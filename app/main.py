@@ -6,8 +6,11 @@ from pydantic import BaseModel, Field
 
 from typing import List, Optional
 from random import randint
+import os
 
 # loading env variables
+from dotenv import load_dotenv
+load_dotenv() # loading the env variables
 '''-------------------------'''
 
 
@@ -40,7 +43,10 @@ posts_db = [
 
 # Making connection to Postgre DB
 try:
-    conn = psycopg2.connect(host='localhost', database='py_api_dev', username='postgres', password='')
+    DB_NAME = os.getenv("DATABASE")
+    DB_USER = os.getenv("DATBASE_USER")
+    DB_PWD = os.getenv("DATABASE_PWD")
+    conn = psycopg2.connect(host='localhost', database=DB_NAME, username=DB_USER, password=DB_PWD)
 
 
 
