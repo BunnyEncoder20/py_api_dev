@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 
 from typing import List, Optional
 from random import randint
+
+# loading env variables
 '''-------------------------'''
 
 
@@ -33,6 +35,8 @@ posts_db = [
     {"_id":1001, "title":"First lines of code", "content":"Hello World", "tags":["#coding", "#projects"]},
     {"_id":1002, "title":"Best food of Humanity", "content":"Pizza *drops mike.", "tags":["#pizza4life", "#italian", "#🤌", "#Mamamia"]},
 ]
+
+
 
 # Making connection to Postgre DB
 try:
