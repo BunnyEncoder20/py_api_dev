@@ -43,8 +43,8 @@ posts_db = [
 
 
 # Making connection to Postgre DB
-conn = get_db_connection()
-            
+conn = get_db_connection()      # conn instance
+cursor = conn.cursor()          # cursor obj
 
 
 
@@ -56,11 +56,17 @@ async def root():
 @app.get("/v1/api/posts")
 def get_posts():
     '''get all posts'''
-    
+    cursor.execute("""
+        SELECT * FROM posts_table
+        ORDER BY created_at DESC, id DESC
+        LIMIT 100;
+    """)
+    data = cursor.fetchall()
+    print(data)
     return {
         "status_code": status.HTTP_200_OK,
-        "msg": "Listing of all posts",
-        "data": posts_db
+        "msg": "Listing of all Lastest posts",
+        "data": data
     }
 
 @app.post("/v1/api/post", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
