@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
+import psycopg2
 
 from pydantic import BaseModel, Field
 
@@ -32,6 +33,10 @@ posts_db = [
     {"_id":1001, "title":"First lines of code", "content":"Hello World", "tags":["#coding", "#projects"]},
     {"_id":1002, "title":"Best food of Humanity", "content":"Pizza *drops mike.", "tags":["#pizza4life", "#italian", "#🤌", "#Mamamia"]},
 ]
+
+# Making connection to Postgre DB
+try:
+    conn = psycopg2.connect(host='localhost', database='py_api_dev', username='postgres', password='')
 
 
 
