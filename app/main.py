@@ -56,13 +56,14 @@ async def root():
 @app.get("/v1/api/posts")
 def get_posts():
     '''get all posts'''
+    # execute SQL query
     cursor.execute("""
         SELECT * FROM posts_table
         ORDER BY created_at DESC, id DESC
         LIMIT 100;
     """)
-    data = cursor.fetchall()
-    print(data)
+    # store result of query
+    data = cursor.fetchall()    # fetchall() for multiple posts and fetchone() for fetching by ID
     return {
         "status_code": status.HTTP_200_OK,
         "msg": "Listing of all Lastest posts",
