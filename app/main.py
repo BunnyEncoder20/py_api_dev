@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 from pydantic import BaseModel, Field
 
 from typing import List, Optional
 from random import randint
-import os
+import os, time
 
 # loading env variables
 from dotenv import load_dotenv
@@ -42,11 +43,35 @@ posts_db = [
 
 
 # Making connection to Postgre DB
-try:
-    DB_NAME = os.getenv("DATABASE")
-    DB_USER = os.getenv("DATBASE_USER")
-    DB_PWD = os.getenv("DATABASE_PWD")
-    conn = psycopg2.connect(host='localhost', database=DB_NAME, username=DB_USER, password=DB_PWD)
+attempt = 0
+MAX_ATTEMPTS = 3
+while attempt <= MAX_ATTEMPTS:
+    try:
+        DB_NAME = os.getenv("DATABASE")
+        DB_USER = os.getenv("DATABASE_USER")
+        DB_PWD = os.getenv("DATABASE_PWD")
+        conn = psycopg2.connect(
+            host='localhost', 
+            database=DB_NAME, 
+            user=DB_USER, 
+            password=DB_PWD, 
+            cursor_factory=RealDictCursor
+        )   
+        cursor = conn.cursor()
+        print("[Server] Database connection was successful!")
+        break
+    
+    except Exception as error:
+        if attempt == MAX_ATTEMPTS:
+            print("[Critical] Server was enable to establish connection with prod DB, aborting server startup.")
+            exit()
+        else:
+            print("[Error] ", error)
+            print("[Server] Could not connect to Database")
+            print("[Server] Retrying to connect to Database...attemp ",attempt)
+            attempt += 1
+            time.sleep(3)
+            
 
 
 
