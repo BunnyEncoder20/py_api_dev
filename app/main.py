@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 
 from pydantic import BaseModel, Field
-from database import get_db_connection
+from .database import get_db_connection
 
 from typing import List, Optional
 from random import randint
