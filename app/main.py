@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 
 from pydantic import BaseModel, Field
-from .database import get_db_connection
+from sqlalchemy.orm import Session
 
 from typing import List, Optional
 from random import randint
@@ -10,9 +10,12 @@ from random import randint
 # loading env variables
 from dotenv import load_dotenv
 load_dotenv() # loading the env variables
-
-
 '''-------------------------'''
+from .database import get_db_connection
+from .database import engine, SessionLocal
+from . import models
+
+
 
 
 
@@ -33,7 +36,7 @@ class Response_Model(BaseModel):
     status_code: int
     msg: Optional[str] = Field(default=None, description="Optional message string")
     data: Optional[dict] = Field(default=None, description="Optional data payload")
-    
+
 
 # temp database
 posts_db = [
@@ -41,11 +44,18 @@ posts_db = [
     {"_id":1002, "title":"Best food of Humanity", "content":"Pizza *drops mike.", "tags":["#pizza4life", "#italian", "#🤌", "#Mamamia"]},
 ]
 
-
-
 # Making connection to Postgre DB
 conn = get_db_connection()      # conn instance
 cursor = conn.cursor()          # cursor obj
+
+# Making connection to Postgres DB using SLQ Alchemy
+models.Base.metadata.create_all(bind=engine)            # needed in main to create tables at server startup
+def get_db() :                                          # needed to provide DB session to route func 
+    db = SessionLocal()
+    try:
+        yield db    
+    finally:
+        db.close()
 
 
 
@@ -181,4 +191,33 @@ def udpate_post(pid: int, ppost: Post_Model):
         "status_code": status.HTTP_200_OK,
         "msg": f"post {pid} was updated successfully",
         "data": updated_post
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+'''-------------- V2 APIs -------------'''
+
+@app.get("/v2/api/posts")
+def get_posts(db: Session = Depends (get_db)):
+    '''get all posts'''
+    # execute SQL query on DB server
+    cursor.execute("""
+        SELECT * FROM posts_table_v2
+        ORDER BY created_at DESC, id DESC
+        LIMIT 100;
+    """)
+    # fetch results of query from DB server
+    data = cursor.fetchall()    # fetchall() for multiple posts and fetchone() for fetching by ID
+
+    # sending res
+    return {
+        "status_code": status.HTTP_200_OK,
+        "msg": "Listing of all Lastest posts",
+        "data": data
     }

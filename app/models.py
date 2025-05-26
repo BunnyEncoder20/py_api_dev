@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 '''-----------------------'''
 from .database import Base
-
-
 
 class Posts(Base):
     __tablename__ = "posts_table_v2"
