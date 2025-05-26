@@ -1,9 +1,7 @@
 import os
 import time
-import psycopg2
+import psycopg2     # pgsql direct driver 
 from psycopg2.extras import RealDictCursor
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 load_dotenv()   # loading env variables
 
@@ -41,8 +39,10 @@ def get_db_connection():
 
 
 
-# Way 2: Usiung SqlAlchemy
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Way 2: Using SqlAlchemy ORM
+from sqlalchemy import create_engine        # Sqlalchemy is a ORM (abstract layer between FastAPI and PGSQL) but still needs a database driver
+from sqlalchemy.orm import sessionmaker, declarative_base
+DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
