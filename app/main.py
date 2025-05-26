@@ -24,7 +24,8 @@ app = FastAPI()
 class Post_Model(BaseModel):
     # _id: int
     title: str
-    body: str
+    content: str
+    published: bool
     tags: List = []
 
 # Pydantic Model for Standardized responses
@@ -56,14 +57,16 @@ async def root():
 @app.get("/v1/api/posts")
 def get_posts():
     '''get all posts'''
-    # execute SQL query
+    # execute SQL query on DB server
     cursor.execute("""
         SELECT * FROM posts_table
         ORDER BY created_at DESC, id DESC
         LIMIT 100;
     """)
-    # store result of query
+    # fetch results of query from DB server
     data = cursor.fetchall()    # fetchall() for multiple posts and fetchone() for fetching by ID
+
+    # sending res
     return {
         "status_code": status.HTTP_200_OK,
         "msg": "Listing of all Lastest posts",
@@ -73,15 +76,25 @@ def get_posts():
 @app.post("/v1/api/post", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
 def make_post(post: Post_Model) -> dict:
     '''create a new post'''
+    # execute SQL on pgserver
+    cursor.execute("""
+        INSERT INTO public.posts_table (title, content, published, tags)
+        VALUES (%s, %s, %s, %s)
+        RETURNING *
+    """, (post.title, post.content, post.published, post.tags))
+    #!!! NEVER USE f"" strings for executing SQL commands. They expose our database to SQL injection attacks, if the user input would contain malicious SQL cmds
+    #!!! Python does not escape the values safely like the psycopg2 parameterized %s syntax does.
     
-    post_data = post.dict()     # converting from pydantic schema to dict
-    post_data["_id"] = randint(1,1000000)
-    print(f"[Server] Creating post : {post_data}")
-    posts_db.append(post_data)
+    # fetch the STAGED results from the server
+    new_post = cursor.fetchone()
+
+    # Commit the changes to DB
+    conn.commit()
+
     return {
-        "status_code": status.HTTP_200_OK,
+        "status_code": status.HTTP_201_CREATED,
         "msg": "Post published successfully",
-        "data": post_data
+        "data": new_post
     }
 
 

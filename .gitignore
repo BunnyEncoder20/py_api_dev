@@ -4,6 +4,6 @@
 # Ignore environment variables
 .env
 
-# Ignore all __pycache__ folders anywhere in the repo
+# Ignore all __pycache__ folders and pyc files recursively
 **/__pycache__/
 **/*.pyc
