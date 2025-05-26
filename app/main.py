@@ -73,12 +73,12 @@ def get_posts():
         "data": data
     }
 
-@app.post("/v1/api/post", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
+@app.post("/v1/api/makepost", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
 def make_post(post: Post_Model) -> dict:
     '''create a new post'''
     # execute SQL on pgserver
     cursor.execute("""
-        INSERT INTO public.posts_table (title, content, published, tags)
+        INSERT INTO posts_table (title, content, published, tags)
         VALUES (%s, %s, %s, %s)
         RETURNING *
     """, (post.title, post.content, post.published, post.tags))
@@ -99,15 +99,18 @@ def make_post(post: Post_Model) -> dict:
 
 
 # using path parameters
-@app.get("/v1/api/post/{id}")
-def get_specific_post(id: int):
-    print(f"[Server] Request for fecthing post [{id}]")
+@app.get("/v1/api/post/{pid}")
+def get_specific_post(pid: int):
+    print(f"[Server] Request for fecthing post {pid}")
     
-    req_post = None
-    for post in posts_db:
-        if post["_id"] == id:
-            req_post = post
-            break
+    # executing SQL query on pg server
+    cursor.execute("""
+        SELECT * FROM posts_table
+        WHERE id = %s  
+    """, (str(pid),))    # Need the id to be an string to fit into query here. Also remember how to pass single value tuples.
+    
+    # Fetch query results from pg server
+    req_post = cursor.fetchone()
     
     if not req_post:
         raise HTTPException(
@@ -117,7 +120,7 @@ def get_specific_post(id: int):
     
     return {
         "status_code": status.HTTP_200_OK ,
-        "msg": "Post published successfully",
+        "msg": "Post fetched successfully",
         "data": req_post
     }
 
