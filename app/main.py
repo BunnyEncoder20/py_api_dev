@@ -11,8 +11,8 @@ from random import randint
 from dotenv import load_dotenv
 load_dotenv() # loading the env variables
 '''-------------------------'''
-from .database import get_db_connection
-from .database import engine, SessionLocal
+from .database import get_db_connection             
+from .database import engine, SessionLocal, get_db
 from . import models
 
 
@@ -50,12 +50,7 @@ cursor = conn.cursor()          # cursor obj
 
 # Making connection to Postgres DB using SLQ Alchemy
 models.Base.metadata.create_all(bind=engine)            # needed in main to create tables at server startup
-def get_db() :                                          # needed to provide DB session to route func 
-    db = SessionLocal()
-    try:
-        yield db    
-    finally:
-        db.close()
+
 
 
 
