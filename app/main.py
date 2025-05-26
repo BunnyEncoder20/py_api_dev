@@ -73,8 +73,35 @@ def get_posts():
         "data": data
     }
 
+# using path parameters
+@app.get("/v1/api/post/{pid}")
+def get_specific_post(pid: int):
+    print(f"[Server] Request for fecthing post {pid}")
+    
+    # executing SQL query on pg server
+    cursor.execute("""
+        SELECT * FROM posts_table
+        WHERE id = %s  
+    """, (str(pid),))    # Need the id to be an string to fit into query here. Also remember how to pass single value tuples.
+    
+    # Fetch query results from pg server
+    req_post = cursor.fetchone()
+    
+    if not req_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post {pid} could not be found"
+        )
+    
+    return {
+        "status_code": status.HTTP_200_OK ,
+        "msg": "Post fetched successfully",
+        "data": req_post
+    }
+
+
 @app.post("/v1/api/makepost", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
-def make_post(post: Post_Model) -> dict:
+def make_post(post: Post_Model):
     '''create a new post'''
     # execute SQL on pgserver
     cursor.execute("""
@@ -98,43 +125,22 @@ def make_post(post: Post_Model) -> dict:
     }
 
 
-# using path parameters
-@app.get("/v1/api/post/{pid}")
-def get_specific_post(pid: int):
-    print(f"[Server] Request for fecthing post {pid}")
-    
-    # executing SQL query on pg server
-    cursor.execute("""
-        SELECT * FROM posts_table
-        WHERE id = %s  
-    """, (str(pid),))    # Need the id to be an string to fit into query here. Also remember how to pass single value tuples.
-    
-    # Fetch query results from pg server
-    req_post = cursor.fetchone()
-    
-    if not req_post:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Post {id} could not be found"
-        )
-    
-    return {
-        "status_code": status.HTTP_200_OK ,
-        "msg": "Post fetched successfully",
-        "data": req_post
-    }
-
 @app.delete("/v1/api/delpost/{pid}", response_model=Response_Model) # specifying response model for standardized reponses
 def delete_post(pid: int):
+    # exe sql in pg server
+    cursor.execute("""
+        DELETE FROM posts_table
+        WHERE id = %s
+        RETURNING *
+    """, (str(pid),))
     
-    deleted = None
-    for i, post in enumerate(posts_db):
-        if post["_id"] == pid:
-            deleted = post
-            posts_db.pop(i)
-            break
+    # fetching results from pg server
+    deleted_post = cursor.fetchone()
+
+    # Commit changes to DB
+    conn.commit()
     
-    if not deleted:
+    if not deleted_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The post with id:{pid} does not exist"
@@ -145,7 +151,7 @@ def delete_post(pid: int):
     return {
         "status_code": status.HTTP_200_OK,
         "msg": f"post {pid} was deleted successfully",
-        "data": deleted
+        "data": deleted_post
     }
     
 @app.put("/v1/api/updatepost/{pid}", response_model=Response_Model)
