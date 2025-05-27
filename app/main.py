@@ -11,7 +11,7 @@ load_dotenv() # loading the env variables
 '''-------------------------'''
 from .database import get_db_connection             
 from .database import engine, SessionLocal, get_db
-from .schemas import Response_Model, Post_Model
+from .schemas import Post_Model, Response_Model, Response_Model_V2
 from . import models
 
 
@@ -44,7 +44,7 @@ async def root():
 
 
 '''-------------- V1 APIs -------------'''
-@app.get("/v1/api/posts")
+@app.get("/v1/api/posts", response_model=Response_Model)
 def get_posts():
     '''get all posts'''
     # execute SQL query on DB server
@@ -64,7 +64,7 @@ def get_posts():
     }
 
 # using path parameters
-@app.get("/v1/api/post/{pid}")
+@app.get("/v1/api/post/{pid}", response_model=Response_Model)
 def get_specific_post(pid: int):
     print(f"[Server] Request for fecthing post {pid}")
     
@@ -89,8 +89,7 @@ def get_specific_post(pid: int):
         "data": req_post
     }
 
-
-@app.post("/v1/api/makepost", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
+@app.post("/v1/api/makepost", response_model=Response_Model)  # how to set default status codes for a path ops
 def make_post(post: Post_Model):
     '''create a new post'''
     # execute SQL on pgserver
@@ -113,7 +112,6 @@ def make_post(post: Post_Model):
         "msg": "Post published successfully",
         "data": new_post
     }
-
 
 @app.delete("/v1/api/delpost/{pid}", response_model=Response_Model) # specifying response model for standardized reponses
 def delete_post(pid: int):
@@ -183,7 +181,7 @@ def udpate_post(pid: int, ppost: Post_Model):
     
 '''-------------- V2 APIs -------------'''
 
-@app.get("/v2/api/posts")
+@app.get("/v2/api/posts", response_model=Response_Model_V2)
 def get_posts(db: Session = Depends(get_db)):
     '''get all posts'''
     data = db.query(models.Posts).all()
@@ -195,7 +193,7 @@ def get_posts(db: Session = Depends(get_db)):
         "data": data
     }
 
-@app.get("/v2/api/post/{pid}")
+@app.get("/v2/api/post/{pid}", response_model=Response_Model_V2)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
     
@@ -214,7 +212,7 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
         "data": req_post
     }
 
-@app.post("/v2/api/makepost", status_code=status.HTTP_201_CREATED)  
+@app.post("/v2/api/makepost", response_class=Response_Model_V2)  
 def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
     '''create a new post'''
     
@@ -240,7 +238,7 @@ def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
         "data": new_post
     }
 
-@app.delete("/v2/api/delpost/{pid}", response_model=Response_Model)
+@app.delete("/v2/api/delpost/{pid}", response_model=Response_Model_V2)
 def delete_post(pid: int, db: Session = Depends(get_db)):
     '''delete a post by ID'''
     
@@ -264,7 +262,7 @@ def delete_post(pid: int, db: Session = Depends(get_db)):
         "msg": f"post {pid} was deleted successfully",
     }
 
-@app.put("/v2/api/updatepost/{pid}", response_model=Response_Model)
+@app.put("/v2/api/updatepost/{pid}", response_model=Response_Model_V2)
 def udpate_post(pid: int, ppost: Post_Model, db: Session = Depends(get_db)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
     
@@ -284,9 +282,5 @@ def udpate_post(pid: int, ppost: Post_Model, db: Session = Depends(get_db)):
     # commit the changes 
     db.commit()
     
-    return {
-        "status_code": status.HTTP_200_OK,
-        "msg": f"post {pid} was updated successfully",
-        "data": findpost_query.first()
-    }
+    return findpost_query.first()
     
