@@ -256,3 +256,27 @@ def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
         "data": new_post
     }
 
+@app.delete("/v2/api/delpost/{pid}", response_model=Response_Model)
+def delete_post(pid: int, db: Session = Depends(get_db)):
+    '''delete a post by ID'''
+    
+    # make init changes
+    del_query = db.query(models.Posts).filter(models.Posts.id == pid)
+    post = del_query.first()
+    
+    # if the post was not found
+    if post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id:{pid} does not exist"
+        )
+    
+    # Delete entry via the query
+    del_query.delete(synchronize_session=False)
+    db.commit()         # don't forget to commit the changes
+    
+    return {
+        "status_code": status.HTTP_200_OK,
+        "msg": f"post {pid} was deleted successfully",
+    }
+  
