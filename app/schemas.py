@@ -20,7 +20,7 @@ class Response_Model(BaseModel):
     class Config:
         orm_mode: True
 
-# Pydantic Model for Standardized Reponses V2 (we directly send the object we receive from DB as res)
+# Pydantic Model for returning only specified fields
 # * We can omit the fields , we do not want to send to the frontend / client
 class Response_Model_V2(BaseModel):
     # id: int
@@ -29,3 +29,6 @@ class Response_Model_V2(BaseModel):
     published: bool
     tags: List
     # created_at: datetime
+    
+    class Config:
+        orm_mode: True

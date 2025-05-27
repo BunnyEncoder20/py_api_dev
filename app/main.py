@@ -4,6 +4,7 @@ from fastapi.params import Body
 from sqlalchemy.orm import Session
 
 from random import randint
+from typing import List
 
 # loading env variables
 from dotenv import load_dotenv
@@ -181,17 +182,13 @@ def udpate_post(pid: int, ppost: Post_Model):
     
 '''-------------- V2 APIs -------------'''
 
-@app.get("/v2/api/posts", response_model=Response_Model_V2)
+@app.get("/v2/api/posts", response_model=List[Response_Model_V2])
 def get_posts(db: Session = Depends(get_db)):
     '''get all posts'''
     data = db.query(models.Posts).all()
     print(data)
     # sending res
-    return {
-        "status_code": status.HTTP_200_OK,
-        "msg": "Listing of all Lastest posts",
-        "data": data
-    }
+    return data
 
 @app.get("/v2/api/post/{pid}", response_model=Response_Model_V2)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
@@ -206,13 +203,9 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
             detail=f"The post with id:{pid} does not exist"
         )
     
-    return {
-        "status_code": status.HTTP_200_OK ,
-        "msg": "Post fetched successfully",
-        "data": req_post
-    }
+    return req_post
 
-@app.post("/v2/api/makepost", response_class=Response_Model_V2)  
+@app.post("/v2/api/makepost", response_model=Response_Model_V2)  
 def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
     '''create a new post'''
     
@@ -232,13 +225,9 @@ def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
     db.commit()             # commit change 
     db.refresh(new_post)    # retreive new entry added to DB
 
-    return {
-        "status_code": status.HTTP_201_CREATED,
-        "msg": "Post published successfully",
-        "data": new_post
-    }
+    return new_post
 
-@app.delete("/v2/api/delpost/{pid}", response_model=Response_Model_V2)
+@app.delete("/v2/api/delpost/{pid}")
 def delete_post(pid: int, db: Session = Depends(get_db)):
     '''delete a post by ID'''
     
