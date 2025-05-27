@@ -1,10 +1,8 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 
-from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from typing import List, Optional, Union
 from random import randint
 
 # loading env variables
@@ -13,29 +11,12 @@ load_dotenv() # loading the env variables
 '''-------------------------'''
 from .database import get_db_connection             
 from .database import engine, SessionLocal, get_db
+from .schemas import Response_Model, Post_Model
 from . import models
-
-
-
 
 
 # making FastAPI class instance
 app = FastAPI()
-
-
-# Pydantic Model for Validation
-class Post_Model(BaseModel):
-    # _id: int
-    title: str
-    content: str
-    published: bool
-    tags: List = []
-
-# Pydantic Model for Standardized responses
-class Response_Model(BaseModel):
-    status_code: int
-    msg: Optional[str] = Field(default=None, description="Optional message string")
-    data: Optional[Union[dict, Post_Model]] = Field(default=None, description="Optional data payload")
 
 
 # temp database
@@ -49,16 +30,20 @@ conn = get_db_connection()      # conn instance
 cursor = conn.cursor()          # cursor obj
 
 # Making connection to Postgres DB using SLQ Alchemy
-models.Base.metadata.create_all(bind=engine)            # needed in main to create tables at server startup
+models.Base.metadata.create_all(bind=engine)   # needed in main to create tables at server startup
 
-
-
-
-# Path operation (routes)
+# Generic Path operation (routes)
 @app.get("/", response_model=Response_Model)
 async def root():
     return {"status_code": status.HTTP_200_OK , "msg": "Hellow World"}
 
+
+
+
+
+
+
+'''-------------- V1 APIs -------------'''
 @app.get("/v1/api/posts")
 def get_posts():
     '''get all posts'''
@@ -229,7 +214,6 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
         "data": req_post
     }
 
-
 @app.post("/v2/api/makepost", status_code=status.HTTP_201_CREATED)  
 def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
     '''create a new post'''
@@ -279,7 +263,6 @@ def delete_post(pid: int, db: Session = Depends(get_db)):
         "status_code": status.HTTP_200_OK,
         "msg": f"post {pid} was deleted successfully",
     }
-
 
 @app.put("/v2/api/updatepost/{pid}", response_model=Response_Model)
 def udpate_post(pid: int, ppost: Post_Model, db: Session = Depends(get_db)):
