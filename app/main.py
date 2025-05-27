@@ -199,7 +199,7 @@ def udpate_post(pid: int, ppost: Post_Model):
 '''-------------- V2 APIs -------------'''
 
 @app.get("/v2/api/posts")
-def get_posts(db: Session = Depends (get_db)):
+def get_posts(db: Session = Depends(get_db)):
     '''get all posts'''
     data = db.query(models.Posts).all()
     print(data)
@@ -210,12 +210,18 @@ def get_posts(db: Session = Depends (get_db)):
         "data": data
     }
 
-@app.get("/v1/api/post/{pid}")
-def get_specific_post(pid: int):
+@app.get("/v2/api/post/{pid}")
+def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
     
-    # 
+    req_post = db.query(models.Posts).filter(models.Posts.id == pid).first()
+    print(req_post)
     
+    if not req_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id:{pid} does not exist"
+        )
     
     return {
         "status_code": status.HTTP_200_OK ,
@@ -224,17 +230,21 @@ def get_specific_post(pid: int):
     }
 
 
-@app.post("/v2/api/makepost", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
+@app.post("/v2/api/makepost", status_code=status.HTTP_201_CREATED)  
 def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
     '''create a new post'''
     
     # making a new entry
-    new_post = models.Posts(
-        title=ppost.title, 
-        content=ppost.content,  
-        published=ppost.published,  
-        tags=ppost.tags
-    )
+    # * This is not a efficient way if there are many columns. Better to unpack the incoming fields using ** and dict()
+    # new_post = models.Posts(
+    #     title=ppost.title, 
+    #     content=ppost.content,  
+    #     published=ppost.published,  
+    #     tags=ppost.tags
+    # )
+    
+    # * Better way to insert the information
+    new_post = models.Posts(**ppost.dict())
     
     db.add(new_post)        # stage changes 
     db.commit()             # commit change 
