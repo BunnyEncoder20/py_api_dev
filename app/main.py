@@ -201,18 +201,48 @@ def udpate_post(pid: int, ppost: Post_Model):
 @app.get("/v2/api/posts")
 def get_posts(db: Session = Depends (get_db)):
     '''get all posts'''
-    # execute SQL query on DB server
-    cursor.execute("""
-        SELECT * FROM posts_table_v2
-        ORDER BY created_at DESC, id DESC
-        LIMIT 100;
-    """)
-    # fetch results of query from DB server
-    data = cursor.fetchall()    # fetchall() for multiple posts and fetchone() for fetching by ID
-
+    data = db.query(models.Posts).all()
+    print(data)
     # sending res
     return {
         "status_code": status.HTTP_200_OK,
         "msg": "Listing of all Lastest posts",
         "data": data
     }
+
+@app.get("/v1/api/post/{pid}")
+def get_specific_post(pid: int):
+    '''retrieving a post by ID'''
+    
+    # 
+    
+    
+    return {
+        "status_code": status.HTTP_200_OK ,
+        "msg": "Post fetched successfully",
+        "data": req_post
+    }
+
+
+@app.post("/v2/api/makepost", status_code=status.HTTP_201_CREATED)  # how to set default status codes for a path ops
+def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
+    '''create a new post'''
+    
+    # making a new entry
+    new_post = models.Posts(
+        title=ppost.title, 
+        content=ppost.content,  
+        published=ppost.published,  
+        tags=ppost.tags
+    )
+    
+    db.add(new_post)        # stage changes 
+    db.commit()             # commit change 
+    db.refresh(new_post)    # retreive new entry added to DB
+
+    return {
+        "status_code": status.HTTP_201_CREATED,
+        "msg": "Post published successfully",
+        "data": new_post
+    }
+
