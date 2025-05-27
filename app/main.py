@@ -4,7 +4,7 @@ from fastapi.params import Body
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from typing import List, Optional
+from typing import List, Optional, Union
 from random import randint
 
 # loading env variables
@@ -35,7 +35,7 @@ class Post_Model(BaseModel):
 class Response_Model(BaseModel):
     status_code: int
     msg: Optional[str] = Field(default=None, description="Optional message string")
-    data: Optional[dict] = Field(default=None, description="Optional data payload")
+    data: Optional[Union[dict, Post_Model]] = Field(default=None, description="Optional data payload")
 
 
 # temp database
@@ -279,4 +279,31 @@ def delete_post(pid: int, db: Session = Depends(get_db)):
         "status_code": status.HTTP_200_OK,
         "msg": f"post {pid} was deleted successfully",
     }
-  
+
+
+@app.put("/v2/api/updatepost/{pid}", response_model=Response_Model)
+def udpate_post(pid: int, ppost: Post_Model, db: Session = Depends(get_db)):
+    '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
+    
+    findpost_query = db.query(models.Posts).filter(models.Posts.id == pid)
+    post = findpost_query.first()
+    
+    # the post to be updated is not found
+    if post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id:{pid} does not exist"
+        )
+    
+    # stage the changes (update needs a dict for values)
+    findpost_query.update(ppost.dict(), synchronize_session=False)
+
+    # commit the changes 
+    db.commit()
+    
+    return {
+        "status_code": status.HTTP_200_OK,
+        "msg": f"post {pid} was updated successfully",
+        "data": findpost_query.first()
+    }
+    
