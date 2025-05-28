@@ -1,11 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Union
 from datetime import datetime
 
 # Pydantic Model for Validation
-class User_PyModel(BaseModel):
-    # _id: int
-    title: str
-    content: str
-    published: bool
-    tags: List = []
+class UserCreate_PyModel(BaseModel):
+    email: EmailStr
+    password: str
+    
