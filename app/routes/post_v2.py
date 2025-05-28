@@ -54,7 +54,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db)):
     #     tags=ppost.tags
     # )
     
-    # * Better way to insert the information
+    # * Better way to insert the information by unpacking the dict
     new_post = Posts(**ppost.dict())
     
     db.add(new_post)        # stage changes 
