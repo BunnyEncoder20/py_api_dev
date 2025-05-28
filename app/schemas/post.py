@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 from datetime import datetime
 
 # Pydantic Model for Validation
-class Post_Model(BaseModel):
+class Post_PyModel(BaseModel):
     # _id: int
     title: str
     content: str

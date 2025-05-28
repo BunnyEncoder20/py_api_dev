@@ -5,8 +5,8 @@ from random import randint
 from typing import List
 
 from app.database import get_db
-from app.schemas.response import Response_Model, Response_Model_V2
-from app.schemas.post import Post_Model
+from app.schemas.response import Response_PyModel_V2
+from app.schemas.post import Post_PyModel
 
 '''------------------------------------------------------------------'''
 
@@ -18,7 +18,7 @@ router = APIRouter(
 
 '''-------------- V2 APIs -------------'''
 
-@router.get("/", response_model=List[Response_Model_V2])
+@router.get("/", response_model=List[Response_PyModel_V2])
 def get_posts(db: Session = Depends(get_db)):
     '''get all posts'''
     data = db.query(models.Posts).all()
@@ -26,7 +26,7 @@ def get_posts(db: Session = Depends(get_db)):
     # sending res
     return data
 
-@router.get("/{pid}", response_model=Response_Model_V2)
+@router.get("/{pid}", response_model=Response_PyModel_V2)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
     
@@ -41,8 +41,8 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
     
     return req_post
 
-@router.post("/makepost", response_model=Response_Model_V2)  
-def make_post(ppost: Post_Model, db: Session = Depends(get_db)):
+@router.post("/makepost", response_model=Response_PyModel_V2)  
+def make_post(ppost: Post_PyModel, db: Session = Depends(get_db)):
     '''create a new post'''
     
     # making a new entry
@@ -87,8 +87,8 @@ def delete_post(pid: int, db: Session = Depends(get_db)):
         "msg": f"post {pid} was deleted successfully",
     }
 
-@router.put("/updatepost/{pid}", response_model=Response_Model_V2)
-def udpate_post(pid: int, ppost: Post_Model, db: Session = Depends(get_db)):
+@router.put("/updatepost/{pid}", response_model=Response_PyModel_V2)
+def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
     
     findpost_query = db.query(models.Posts).filter(models.Posts.id == pid)

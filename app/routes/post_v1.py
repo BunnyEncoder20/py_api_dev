@@ -5,8 +5,9 @@ from random import randint
 from typing import List
 
 from app.database import get_db_connection, get_db
-from app.schemas.response import Response_Model, Response_Model_V2
-from app.schemas.post import Post_Model
+from app.models.post import Posts
+from app.schemas.response import Response_PyModel
+from app.schemas.post import Post_PyModel
 
 '''------------------------------------------------------------------'''
 
@@ -41,7 +42,7 @@ def get_posts():
     }
 
 # using path parameters
-@router.get("/{pid}", response_model=Response_Model)
+@router.get("/{pid}", response_model=Response_PyModel)
 def get_specific_post(pid: int):
     print(f"[Server] Request for fecthing post {pid}")
     
@@ -66,8 +67,8 @@ def get_specific_post(pid: int):
         "data": req_post
     }
 
-@router.post("/makepost", response_model=Response_Model)  # how to set default status codes for a path ops
-def make_post(post: Post_Model):
+@router.post("/makepost", response_model=Response_PyModel)  # how to set default status codes for a path ops
+def make_post(post: Post_PyModel):
     '''create a new post'''
     # execute SQL on pgserver
     cursor.execute("""
@@ -90,7 +91,7 @@ def make_post(post: Post_Model):
         "data": new_post
     }
 
-@router.delete("/delpost/{pid}", response_model=Response_Model) # specifying response model for standardized reponses
+@router.delete("/delpost/{pid}", response_model=Response_PyModel) # specifying response model for standardized reponses
 def delete_post(pid: int):
     # exe sql in pg server
     cursor.execute("""
@@ -119,8 +120,8 @@ def delete_post(pid: int):
         "data": deleted_post
     }
     
-@router.put("/updatepost/{pid}", response_model=Response_Model)
-def udpate_post(pid: int, ppost: Post_Model):
+@router.put("/updatepost/{pid}", response_model=Response_PyModel)
+def udpate_post(pid: int, ppost: Post_PyModel):
     # execute sql on pg server side
     cursor.execute("""
         UPDATE posts_table
