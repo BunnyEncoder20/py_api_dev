@@ -59,7 +59,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db)):
     
     db.add(new_post)        # stage changes 
     db.commit()             # commit change 
-    db.refresh(new_post)    # retreive new entry added to DB
+    db.refresh(new_post)    # retreive new entry (with auto gen fields like ID, created_at)
 
     return new_post
 
