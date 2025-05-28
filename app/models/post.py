@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ARRAY, Text, TIMESTAMP
 from sqlalchemy.sql import expression, func
 '''-----------------------'''
-from .database import Base
+from app.database import Base
 
 class Posts(Base):
     __tablename__ = "posts_table_v2"
@@ -12,15 +12,3 @@ class Posts(Base):
     published = Column(Boolean, server_default=expression.true())        # by default nullable = True
     tags = Column(ARRAY(Text), server_default="{}")
     created_at = Column(TIMESTAMP(timezone=False), server_default=func.now(), nullable=False)
-
-
-'''-------------- User based Functionality ----------------------'''
-
-class Users(Base):
-    __tablename__ = "users"
-    
-    id = Column(Integer, primary_key=True, nullable=False)
-    email = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=False), server_default=func.now(), nullable=False)
-    

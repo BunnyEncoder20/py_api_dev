@@ -1,15 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional
 from datetime import datetime
-
-
-# Pydantic Model for Validation
-class Post_Model(BaseModel):
-    # _id: int
-    title: str
-    content: str
-    published: bool
-    tags: List = []
 
 # Pydantic Model for Standardized responses
 class Response_Model(BaseModel):
@@ -32,6 +23,3 @@ class Response_Model_V2(BaseModel):
     
     class Config:
         orm_mode: True
-
-
-
