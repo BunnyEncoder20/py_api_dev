@@ -44,7 +44,6 @@ def get_posts():
 # using path parameters
 @router.get("/{pid}", response_model=Response_PyModel)
 def get_specific_post(pid: int):
-    print(f"[Server] Request for fecthing post {pid}")
     
     # executing SQL query on pg server
     cursor.execute("""
