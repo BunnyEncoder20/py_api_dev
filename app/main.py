@@ -12,7 +12,7 @@ from app.models import user as user_model
 # database
 from app.database import Base, engine       
 
-
+'''------------------------------------------------------------------'''
 
 
 # making FastAPI class instance
