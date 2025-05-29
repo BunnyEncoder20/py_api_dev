@@ -18,7 +18,7 @@ def login(pcredentials: login_user_PyModel, db: Session = Depends(get_db)):
     user = db.query(Users).filter(Users.email == pcredentials.email).first()
     
     # wrong email or password
-    if not user or not verify_pwd(pcredentials, user.password):
+    if not user or not verify_pwd(pcredentials.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Invalid credentials"
