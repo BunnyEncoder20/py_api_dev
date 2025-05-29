@@ -6,4 +6,7 @@ from datetime import datetime
 class register_user_PyModel(BaseModel):
     email: EmailStr
     password: str
-    
+
+class login_user_PyModel(BaseModel):
+    email: EmailStr
+    password: str

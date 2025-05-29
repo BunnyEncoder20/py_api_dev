@@ -23,6 +23,20 @@ def get_users(db: Session = Depends(get_db)):
     # sending res
     return data
 
+@router.get("/{pid}", response_model=User_Response_PyModel)
+def get_users(pid: int, db: Session = Depends(get_db)):
+    '''get users by ID'''
+    user = db.query(Users).filter(Users.id == pid).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id[{pid}] does not exist"
+        )
+    
+    # sending res
+    return user
+
 @router.post("/register", response_model=User_Response_PyModel)
 def register_user(puser: register_user_PyModel, db: Session = Depends(get_db)):
     puser.password = hash_pwd(puser.password)

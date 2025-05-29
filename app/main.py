@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 
 # routes
 from app.routes import post_v1 as postv1_route          
 from app.routes import post_v2 as postv2_route          
-from app.routes import user as user_route
+from app.routes import user as userv1_route
+from app.routes import auth as authv1_route
            
 # models
 from app.models import post as post_model
@@ -32,4 +33,5 @@ async def root():
 # include routers
 app.include_router(postv1_route.router)
 app.include_router(postv2_route.router)
-app.include_router(user_route.router)
+app.include_router(userv1_route.router)
+app.include_router(authv1_route.router)
