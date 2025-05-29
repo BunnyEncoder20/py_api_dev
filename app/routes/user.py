@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 from random import randint
 from typing import List
@@ -14,6 +15,9 @@ router = APIRouter(
     tags=["Users"]
 )
 
+# setting up encryption context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 @router.get("/")
 def get_users(db: Session = Depends(get_db)):
     '''get all users'''
@@ -24,6 +28,7 @@ def get_users(db: Session = Depends(get_db)):
 
 @router.post("/register", response_model=User_Response_PyModel)
 def register_user(puser: register_user_PyModel, db: Session = Depends(get_db)):
+    puser.password = pwd_context.hash(puser.password)     # hashing the password
     new_user = Users(**puser.dict())
     db.add(new_user)
     db.commit()
