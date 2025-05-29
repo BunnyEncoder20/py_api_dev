@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime
 
@@ -23,3 +23,11 @@ class Response_PyModel_V2(BaseModel):
     
     class Config:
         orm_mode: True
+
+
+# Pydantic Model for returning user data
+class User_Response_PyModel(BaseModel):
+    id: int
+    email: EmailStr
+    # password: str
+    created_at: datetime
