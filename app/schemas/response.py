@@ -31,3 +31,6 @@ class User_Response_PyModel(BaseModel):
     email: EmailStr
     # password: str
     created_at: datetime
+    
+    class Config:
+        orm_mode: True
