@@ -8,6 +8,7 @@ from app.database import get_db
 from app.schemas.response import Response_PyModel_V2
 from app.schemas.post import Post_PyModel
 from app.models.post import Posts
+from app.utils import oauth2
 
 '''------------------------------------------------------------------'''
 
@@ -42,7 +43,7 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
     return req_post
 
 @router.post("/makepost", response_model=Response_PyModel_V2)  
-def make_post(ppost: Post_PyModel, db: Session = Depends(get_db)):
+def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     '''create a new post'''
     
     # making a new entry
@@ -55,6 +56,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db)):
     # )
     
     # * Better way to insert the information by unpacking the dict
+    print(f"User {user_id} is making a new post")
     new_post = Posts(**ppost.dict())
     
     db.add(new_post)        # stage changes 

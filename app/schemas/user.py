@@ -13,4 +13,3 @@ class login_user_PyModel(BaseModel):
 
 class user_token_PyModel(BaseModel):
     id: int
-    email: EmailStr

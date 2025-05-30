@@ -35,17 +35,18 @@ def get_current_user(token: str = Depends(oauth2_schema)):
     
     return verify_access_token(token, credentials_expection)
 
+
 def verify_access_token(token: str, credentials_expection):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         
-        token_id: str = payload.get(user_id)
-        token_email: EmailStr = payload.get(email)
+        token_id: str = payload.get('user_id')
+        token_email: EmailStr = payload.get('email')
         
         if not token_id or not token_email:
             raise credentials_expection
 
-        token_data = user_token_PyModel(id=token_id, email=token_email)
+        token_data = user_token_PyModel(id=token_id)
         
     except InvalidTokenError:
         raise credentials_expection
