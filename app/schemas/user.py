@@ -10,3 +10,7 @@ class register_user_PyModel(BaseModel):
 class login_user_PyModel(BaseModel):
     email: EmailStr
     password: str
+
+class user_token_PyModel(BaseModel):
+    id: int
+    email: EmailStr
