@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.user import Users
 from app.database import get_db
 from app.utils.encryption import hash_pwd
-from app.schemas import response
+from app.schemas import user, response
 from app.utils import encryption, oauth2
 
 
@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 @router.get("/login", response_model=response.Token_Reponse_PyModel)
-def login(pcred: login_user_PyModel, db: Session = Depends(get_db)):
+def login(pcred: user.login_user_PyModel, db: Session = Depends(get_db)):
     user = db.query(Users).filter(Users.email == pcred.email).first()
     
     # wrong email or password
