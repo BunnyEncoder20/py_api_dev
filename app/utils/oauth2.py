@@ -18,7 +18,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now() + timedelta(minutes=EXPIRATION_MINS)
+    expire = datetime.utcnow() + timedelta(minutes=EXPIRATION_MINS)
     to_encode.update({"exp": expire})
 
     access_token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -37,7 +37,7 @@ def get_current_user(token: str = Depends(oauth2_schema)):
 
 def verify_access_token(token: str, credentials_expection):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         
         token_id: str = payload.get(user_id)
         token_email: EmailStr = payload.get(email)
@@ -46,6 +46,8 @@ def verify_access_token(token: str, credentials_expection):
             raise credentials_expection
 
         token_data = user_token_PyModel(id=token_id, email=token_email)
-    
+        
     except InvalidTokenError:
         raise credentials_expection
+    
+    return token_data

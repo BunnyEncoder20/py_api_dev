@@ -5,7 +5,7 @@ from app.models.user import Users
 from app.database import get_db
 from app.utils.encryption import hash_pwd
 from app.schemas.user import login_user_PyModel
-from app.utils import encryption, token_auth
+from app.utils import encryption, oauth2
 
 
 router = APIRouter(
@@ -20,12 +20,12 @@ def login(pcred: login_user_PyModel, db: Session = Depends(get_db)):
     # wrong email or password
     if not user or not encryption.verify_pwd(pcred.password, user.password):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Invalid credentials"
         )
     
     # create JWT token
-    access_token = token_auth.create_access_token(data={
+    access_token = oauth2.create_access_token(data={
         'user_id': user.id,
         'email': user.email
     })
