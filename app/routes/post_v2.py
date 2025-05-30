@@ -43,7 +43,7 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
     return req_post
 
 @router.post("/makepost", response_model=Response_PyModel_V2)  
-def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     '''create a new post'''
     
     # making a new entry
@@ -56,7 +56,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int =
     # )
     
     # * Better way to insert the information by unpacking the dict
-    print(f"User {user_id} is making a new post")
+    print(f"User {current_user.id} is making a new post")
     new_post = Posts(**ppost.dict())
     
     db.add(new_post)        # stage changes 
@@ -66,7 +66,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int =
     return new_post
 
 @router.delete("/delpost/{pid}")
-def delete_post(pid: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def delete_post(pid: int, db: Session = Depends(get_db), curent_user: int = Depends(oauth2.get_current_user)):
     '''delete a post by ID'''
     
     # make init changes
@@ -80,6 +80,8 @@ def delete_post(pid: int, db: Session = Depends(get_db), user_id: int = Depends(
             detail=f"The post with id:{pid} does not exist"
         )
     
+    print(f"User {curent_user.id} if deleting post {pid}")
+    
     # Delete entry via the query
     del_query.delete(synchronize_session=False)
     db.commit()         # don't forget to commit the changes
@@ -90,7 +92,7 @@ def delete_post(pid: int, db: Session = Depends(get_db), user_id: int = Depends(
     }
 
 @router.put("/updatepost/{pid}", response_model=Response_PyModel_V2)
-def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
     
     findpost_query = db.query(Posts).filter(Posts.id == pid)
@@ -102,6 +104,8 @@ def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db), us
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The post with id:{pid} does not exist"
         )
+    
+    print(f"INFO: \t User {current_user.id} is updating post {pid}")
     
     # stage the changes (update needs a dict for values)
     findpost_query.update(ppost.dict(), synchronize_session=False)

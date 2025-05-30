@@ -1,9 +1,12 @@
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 import jwt
 from jwt.exceptions import InvalidTokenError
 
 from app.schemas.user import user_token_PyModel
+from app.models.user import Users
+from app.database import get_db
 
 from datetime import datetime, timedelta
 import os
@@ -13,7 +16,7 @@ load_dotenv()   # loading env variables
 # Needed for the JWT
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-EXPIRATION_MINS = 30
+EXPIRATION_MINS = 60
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
 def create_access_token(data: dict):
@@ -26,14 +29,21 @@ def create_access_token(data: dict):
     return access_token
 
 
-def get_current_user(token: str = Depends(oauth2_schema)):
+def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(get_db)):
+    '''func to auth user and fetch user from database'''
+    
     credentials_expection = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail='Could not validate credentials from token.',
         headers={'WWW-Authenticate': 'Bearer'}
     )
     
-    return verify_access_token(token, credentials_expection)
+    verified_token = verify_access_token(token, credentials_expection)
+    
+    # fetch user from the DB
+    user = db.query(Users).filter(Users.id == verified_token.id).first()
+    
+    return user
 
 
 def verify_access_token(token: str, credentials_expection):
