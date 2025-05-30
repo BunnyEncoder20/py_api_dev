@@ -34,3 +34,9 @@ class User_Response_PyModel(BaseModel):
     
     class Config:
         orm_mode: True
+
+class Token_Reponse_PyModel(BaseModel):
+    status: int
+    msg: str
+    token_type: str
+    access_token: str

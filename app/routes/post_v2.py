@@ -66,7 +66,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int =
     return new_post
 
 @router.delete("/delpost/{pid}")
-def delete_post(pid: int, db: Session = Depends(get_db)):
+def delete_post(pid: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     '''delete a post by ID'''
     
     # make init changes
@@ -90,7 +90,7 @@ def delete_post(pid: int, db: Session = Depends(get_db)):
     }
 
 @router.put("/updatepost/{pid}", response_model=Response_PyModel_V2)
-def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db)):
+def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
     
     findpost_query = db.query(Posts).filter(Posts.id == pid)
