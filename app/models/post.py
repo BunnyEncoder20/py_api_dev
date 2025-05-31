@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ARRAY, Text, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Boolean, ARRAY, Text, TIMESTAMP, ForeignKey
 from sqlalchemy.sql import expression, func
 '''-----------------------'''
 from app.database import Base
@@ -12,3 +12,4 @@ class Posts(Base):
     published = Column(Boolean, server_default=expression.true())        # by default nullable = True
     tags = Column(ARRAY(Text), server_default="{}")
     created_at = Column(TIMESTAMP(timezone=False), server_default=func.now(), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
