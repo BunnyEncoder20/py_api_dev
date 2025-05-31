@@ -19,7 +19,8 @@ class Response_PyModel_V2(BaseModel):
     content: str
     published: bool
     tags: List
-    # created_at: datetime
+    created_at: datetime
+    user_id: int
     
     class Config:
         orm_mode: True
