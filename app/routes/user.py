@@ -24,7 +24,7 @@ def get_users(db: Session = Depends(get_db)):
     return data
 
 @router.get("/{pid}", response_model=User_Response_PyModel)
-def get_users(pid: int, db: Session = Depends(get_db)):
+def get_specifi_user(pid: int, db: Session = Depends(get_db)):
     '''get users by ID'''
     user = db.query(Users).filter(Users.id == pid).first()
 
