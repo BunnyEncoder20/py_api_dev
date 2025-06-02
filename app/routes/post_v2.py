@@ -20,9 +20,9 @@ router = APIRouter(
 '''-------------- V2 APIs -------------'''
 
 @router.get("/", response_model=List[response.Response_PyModel_V2])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db), limit: int = 100):
     '''get all posts'''
-    data = db.query(Posts).all()
+    data = db.query(Posts).limit(limit).all()
     
     # sending res
     return data
