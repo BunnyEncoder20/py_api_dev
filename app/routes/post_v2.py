@@ -27,6 +27,16 @@ def get_posts(db: Session = Depends(get_db)):
     # sending res
     return data
 
+
+@router.get("/by", response_model=List[response.Response_PyModel_V2])
+def get_posts_by_user(db:Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    '''get all posts by user'''
+    
+    print(f"Fetching all posts by User {current_user.id}")
+    list_of_posts = db.query(Posts).filter(Posts.user_id == current_user.id).all()
+    
+    return list_of_posts
+
 @router.get("/{pid}", response_model=response.Response_PyModel_V2)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
@@ -40,6 +50,8 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
         )
     
     return req_post
+
+    
 
 @router.post("/makepost", response_model=response.Response_PyModel_V2)  
 def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
@@ -116,11 +128,11 @@ def udpate_post(pid: int, ppost: post.Post_PyModel, db: Session = Depends(get_db
     print(f"INFO: \t User {current_user.id} is updating post {pid}")
     
     # check if post is of user
-    if post.user_id != curent_user.id:
-        print(f"ERR: \t  {curent_user.id} cannot update post {pid} by {post.user_id}")
+    if post.user_id != current_user.id:
+        print(f"ERR: \t  {current_user.id} cannot update post {pid} by {post.user_id}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f'User {curent_user.id} is not autherized to update post {pid}'
+            detail=f'User {current_user.id} is not autherized to update post {pid}'
         )
     
     
