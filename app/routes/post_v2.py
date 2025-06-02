@@ -56,8 +56,7 @@ def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_u
     
     # * Better way to insert the information by unpacking the dict
     print(f"User {current_user.id} is making a new post")
-    ppost[""]
-    new_post = Posts(**ppost.dict())
+    new_post = Posts(user_id=current_user.id, **ppost.dict())
     
     db.add(new_post)        # stage changes 
     db.commit()             # commit change 
