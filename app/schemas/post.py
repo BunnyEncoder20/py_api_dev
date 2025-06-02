@@ -9,3 +9,4 @@ class Post_PyModel(BaseModel):
     content: str
     published: bool
     tags: List = []
+    

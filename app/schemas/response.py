@@ -11,21 +11,6 @@ class Response_PyModel(BaseModel):
     class Config:
         orm_mode: True
 
-# Pydantic Model for returning only specified fields
-# * We can omit the fields , we do not want to send to the frontend / client
-class Response_PyModel_V2(BaseModel):
-    # id: int
-    title: str
-    content: str
-    published: bool
-    tags: List
-    created_at: datetime
-    user_id: int
-    
-    class Config:
-        orm_mode: True
-
-
 # Pydantic Model for returning user data
 class User_Response_PyModel(BaseModel):
     id: int
@@ -35,6 +20,23 @@ class User_Response_PyModel(BaseModel):
     
     class Config:
         orm_mode: True
+        
+
+# Pydantic Model for returning only specified fields
+# * We can omit the fields , we do not want to send to the frontend / client
+class Response_PyModel_V2(BaseModel):
+    # id: int
+    title: str
+    content: str
+    published: bool
+    tags: List
+    created_at: datetime
+    # user_id: int
+    user: User_Response_PyModel     # this is the name of the Pydantic model of User resp
+    
+    class Config:
+        orm_mode: True
+
 
 class Token_Reponse_PyModel(BaseModel):
     status: int

@@ -17,4 +17,4 @@ class Posts(Base):
     user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
     
     # automatically fetch the user through user_id. 
-    user = relationship("Users")
+    user = relationship("Users")            # Users is the name of the SqlAlchemy class, not the actual SQL table
