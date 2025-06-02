@@ -5,8 +5,7 @@ from random import randint
 from typing import List
 
 from app.database import get_db
-from app.schemas.response import Response_PyModel_V2
-from app.schemas.post import Post_PyModel
+from app.schemas import response, post
 from app.models.post import Posts
 from app.utils import oauth2
 
@@ -20,7 +19,7 @@ router = APIRouter(
 
 '''-------------- V2 APIs -------------'''
 
-@router.get("/", response_model=List[Response_PyModel_V2])
+@router.get("/", response_model=List[response.Response_PyModel_V2])
 def get_posts(db: Session = Depends(get_db)):
     '''get all posts'''
     data = db.query(Posts).all()
@@ -28,7 +27,7 @@ def get_posts(db: Session = Depends(get_db)):
     # sending res
     return data
 
-@router.get("/{pid}", response_model=Response_PyModel_V2)
+@router.get("/{pid}", response_model=response.Response_PyModel_V2)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
     
@@ -42,8 +41,8 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
     
     return req_post
 
-@router.post("/makepost", response_model=Response_PyModel_V2)  
-def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.post("/makepost", response_model=response.Response_PyModel_V2)  
+def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     '''create a new post'''
     
     # making a new entry
@@ -57,6 +56,7 @@ def make_post(ppost: Post_PyModel, db: Session = Depends(get_db), current_user: 
     
     # * Better way to insert the information by unpacking the dict
     print(f"User {current_user.id} is making a new post")
+    ppost[""]
     new_post = Posts(**ppost.dict())
     
     db.add(new_post)        # stage changes 
@@ -91,8 +91,8 @@ def delete_post(pid: int, db: Session = Depends(get_db), curent_user: int = Depe
         "msg": f"post {pid} was deleted successfully",
     }
 
-@router.put("/updatepost/{pid}", response_model=Response_PyModel_V2)
-def udpate_post(pid: int, ppost: Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.put("/updatepost/{pid}", response_model=response.Response_PyModel_V2)
+def udpate_post(pid: int, ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
     
     findpost_query = db.query(Posts).filter(Posts.id == pid)
