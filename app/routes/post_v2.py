@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from random import randint
 from typing import List, Optional
@@ -22,9 +23,10 @@ router = APIRouter(
 @router.get("/", response_model=List[response.Response_PyModel_V2])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     '''get all posts'''
-    data = db.query(Posts).filter(
-            Posts.title.contains(search)
-        ).limit(limit).offset(skip).all()
+    data = db.query(Posts).filter(or_(
+            Posts.title.ilike(f'%{search}%'),       # making the search case insensitive
+            Posts.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
+        )).limit(limit).offset(skip).all()
     
     # sending res
     return data
