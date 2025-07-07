@@ -42,12 +42,24 @@ from app.config import settings
 env_variable = settings.ENV_NAME
 ```
 
-2. Voting / Likes systems → Composite Key
+2. Voting / Likes systems
+   1. DB Properties
+      1. User should be able to like a post once only
+      2. For this we would need 2 cols atleast [postID, userID] and each combination of these would need to be unique
+      3. we can achieve that by using **composite keys** in PgSQL. **Composite Keys** are simpily a primary key, which spans multiple columns
+      4. As primary keys can only be unique, this will take care of our requirement.
+   2. Vote Route
+      1. Path will be at "/vote"
+      2. The user id will be extracted from the JWT token
+      3. The body will contain the id of the post the user is voting on as well as the direction of the vote.
+      4. A vote direction of 1 means we want to add a vote, a direction of O means we want to delete a vote.
 
-- User should be able to like a post once only
-- For this we would need 2 cols atleast [postID, userID] and each combination of these would need to be unique
-- we can achieve that by using **composite keys** in PgSQL. **Composite Keys** are simpily a primary key, which spans multiple columns
-- As primary keys can only be unique, this will take care of our requirement.
+```python
+{
+post_id: 1432
+vote_dir: 0
+}
+```
 
 ---
 
