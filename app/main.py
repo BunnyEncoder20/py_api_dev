@@ -7,11 +7,14 @@ from app.routes import user as userv1_route
 from app.routes import auth as authv1_route
            
 # models
-from app.models import post as post_model
-from app.models import user as user_model
+# from app.models import post as post_model
+# from app.models import user as user_model
 
 # database
-from app.database import Base, engine       
+from app.database import Base, engine
+
+# Config / settings (for validation of env variables)
+from app.config import settings
 
 '''------------------------------------------------------------------'''
 

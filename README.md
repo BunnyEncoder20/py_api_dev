@@ -21,3 +21,34 @@
 
 - Backend api dev, is just making a bunch of path operations
   ![alt text](image.png)
+
+---
+
+## Things Learned
+
+1. Central Env variable loading
+   - done using config file using pydantic-settings package:BaseSettings
+   - Introduces:
+     - Type safety
+     - Env variable validation
+     - Centralized config loading. Single source of truth
+     - Gives Auto complete and IDE help (from pydantic-settings package)
+   - Now instead of loading env variables in each file, we just import the settings/config class from the app.config and use the follow way to access env variables
+
+```python
+from app.config import settings
+
+env_variable = settings.ENV_NAME
+```
+
+---
+
+### Important Commands
+
+1. Starting the API server
+
+```
+uvicorn app.main:app --reload
+```
+
+2.

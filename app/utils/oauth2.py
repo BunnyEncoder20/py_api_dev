@@ -7,15 +7,13 @@ from jwt.exceptions import InvalidTokenError
 from app.schemas.user import user_token_PyModel
 from app.models.user import Users
 from app.database import get_db
+from app.config import settings
 
 from datetime import datetime, timedelta
-import os
-from dotenv import load_dotenv
-load_dotenv()   # loading env variables
 
 # Needed for the JWT
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
 EXPIRATION_MINS = 60
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
