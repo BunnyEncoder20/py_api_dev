@@ -10,16 +10,17 @@ from app.database import get_db
 from app.config import settings
 
 from datetime import datetime, timedelta
+from pydantic import EmailStr
 
 # Needed for the JWT
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
-EXPIRATION_MINS = 60
+EXPIRATION_MINS = settings.EXPIRATION_MINS
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=EXPIRATION_MINS)
+    expire = datetime.datetime.utcnow() + timedelta(minutes=EXPIRATION_MINS)
     to_encode.update({"exp": expire})
 
     access_token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -30,12 +31,14 @@ def create_access_token(data: dict):
 def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(get_db)):
     '''func to auth user and fetch user from database'''
     
+    # defining invalid credentials exception
     credentials_expection = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail='Could not validate credentials from token.',
         headers={'WWW-Authenticate': 'Bearer'}
     )
     
+    # verify token first
     verified_token = verify_access_token(token, credentials_expection)
     
     # fetch user from the DB

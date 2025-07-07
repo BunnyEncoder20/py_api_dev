@@ -7,14 +7,16 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
 
     # postgres DB env variables
-    DATABASE: str
+    DATABASE_HOSTNAME: str
+    DATABASE_NAME: str
     DATABASE_USERNAME: str
     DATABASE_PASSWORD: str
-    SQLALCHEMY_DATABASE_URL: str
+    DATABASE_PORT: int
 
     # JWT variables
     SECRET_KEY: str
     ALGORITHM: str
+    EXPIRATION_MINS: int
 
     class Config:
         env_file = ".env"

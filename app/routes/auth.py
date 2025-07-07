@@ -15,6 +15,17 @@ router = APIRouter(
 
 @router.get("/login", response_model=response.Token_Reponse_PyModel)
 def login(pcred: user.login_user_PyModel, db: Session = Depends(get_db)):
+    """
+    Authenticate a user and generate a JWT access token upon successful login.
+    Args:
+        pcred (user.login_user_PyModel): The login credentials provided by the user, including email and password.
+        db (Session, optional): SQLAlchemy database session dependency.
+    Raises:
+        HTTPException: If the provided email or password is incorrect, raises a 403 Forbidden error with an "Invalid credentials" message.
+    Returns:
+        dict: A dictionary containing the HTTP status code, a success message, the token type, and the generated JWT access token.
+    """
+
     user = db.query(Users).filter(Users.email == pcred.email).first()
     
     # wrong email or password

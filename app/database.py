@@ -3,11 +3,8 @@ import time
 import psycopg2     # pgsql direct driver 
 from psycopg2.extras import RealDictCursor
 
-'''------------------------------------------------------------------'''
-
 # cofig for env variables 
 from app.config import settings
-
 '''------------------------------------------------------------------'''
 
 
@@ -18,15 +15,11 @@ def get_db_connection():
 
     while attempt <= MAX_ATTEMPTS:
         try:
-            DB_NAME = settings.DATABASE
-            DB_USER = settings.DATABASE_USERNAME
-            DB_PWD = settings.DATABASE_PASSWORD
-
             conn = psycopg2.connect(
-                host='localhost',
-                database=DB_NAME,
-                user=DB_USER,
-                password=DB_PWD,
+                host=settings.DATABASE_HOSTNAME,
+                database=settings.DATABASE_NAME,
+                user=settings.DATABASE_USERNAME,
+                password=settings.DATABASE_PASSWORD,
                 cursor_factory=RealDictCursor
             )
             print("[Server] ✅ Database connection was successful!")
@@ -47,7 +40,7 @@ def get_db_connection():
 # Way 2: Using SqlAlchemy ORM
 from sqlalchemy import create_engine        # Sqlalchemy is a ORM (abstract layer between FastAPI and PGSQL) but still needs a database driver
 from sqlalchemy.orm import sessionmaker, declarative_base
-DATABASE_URL = settings.SQLALCHEMY_DATABASE_URL
+DATABASE_URL = f"postgresql://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOSTNAME}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
