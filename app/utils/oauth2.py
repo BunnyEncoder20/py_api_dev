@@ -9,7 +9,7 @@ from app.models.user import Users
 from app.database import get_db
 from app.config import settings
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pydantic import EmailStr
 
 # Needed for the JWT
@@ -20,7 +20,7 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='login')
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.datetime.utcnow() + timedelta(minutes=EXPIRATION_MINS)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=EXPIRATION_MINS)
     to_encode.update({"exp": expire})
 
     access_token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

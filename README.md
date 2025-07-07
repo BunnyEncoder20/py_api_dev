@@ -52,7 +52,7 @@ env_variable = settings.ENV_NAME
       1. Path will be at "/vote"
       2. The user id will be extracted from the JWT token
       3. The body will contain the id of the post the user is voting on as well as the direction of the vote.
-      4. A vote direction of 1 means we want to add a vote, a direction of O means we want to delete a vote.
+      4. A vote direction of 1 means we want to add a vote, a direction of O means we want to delete a vote.w
 
 ```python
 {

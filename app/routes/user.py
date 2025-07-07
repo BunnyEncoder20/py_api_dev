@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
-from random import randint
-from typing import List
-
 from app.schemas.response import User_Response_PyModel
 from app.schemas.user import register_user_PyModel
 from app.models.user import Users

@@ -5,10 +5,6 @@ from app.routes import post_v1 as postv1_route
 from app.routes import post_v2 as postv2_route          
 from app.routes import user as userv1_route
 from app.routes import auth as authv1_route
-           
-# models
-# from app.models import post as post_model
-# from app.models import user as user_model
 
 # database
 from app.database import Base, engine
