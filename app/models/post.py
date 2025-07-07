@@ -3,7 +3,6 @@ from sqlalchemy.sql import expression, func
 from sqlalchemy.orm import relationship
 '''-----------------------'''
 from app.database import Base
-from app.models.user import Users
 
 class Posts(Base):
     __tablename__ = "posts_table_v2"

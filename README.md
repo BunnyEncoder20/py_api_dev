@@ -2,7 +2,7 @@
 
 - Will be using this repo for learning API development using Python.
 
-### Tech Stack
+## Tech Stack
 
 - **Fast API**: Cause it's build keeping api development in mind and also has a auto documentation feature (becasue it is important to document how an api works)
 - **Postgres**: SQL database (almost all the same)
@@ -10,14 +10,14 @@
 
 ---
 
-## Documentations:
+## Documentations
 
 - Please visit the [FastAPI Documentations](https://fastapi.tiangolo.com/tutorial/first-steps/#what-is-openapi-for) Page.
 - It literally has everything, from setting up venvs to everything to write robost APIs in pyhton
 
 ---
 
-### Backend API Dev
+## Backend API Dev
 
 - Backend api dev, is just making a bunch of path operations
   ![alt text](image.png)
@@ -27,6 +27,7 @@
 ## Things Learned
 
 1. Central Env variable loading
+
    - done using config file using pydantic-settings package:BaseSettings
    - Introduces:
      - Type safety
@@ -41,14 +42,19 @@ from app.config import settings
 env_variable = settings.ENV_NAME
 ```
 
+2. Voting / Likes systems → Composite Key
+
+- User should be able to like a post once only
+- For this we would need 2 cols atleast [postID, userID] and each combination of these would need to be unique
+- we can achieve that by using **composite keys** in PgSQL. **Composite Keys** are simpily a primary key, which spans multiple columns
+- As primary keys can only be unique, this will take care of our requirement.
+
 ---
 
 ### Important Commands
 
 1. Starting the API server
 
-```
+```text
 uvicorn app.main:app --reload
 ```
-
-2.

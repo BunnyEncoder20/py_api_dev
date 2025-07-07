@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ARRAY, Text, TIMESTAMP
-from sqlalchemy.sql import expression, func
+from sqlalchemy.sql import func
 '''-----------------------'''
 from ..database import Base
 
