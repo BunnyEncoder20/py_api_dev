@@ -30,7 +30,7 @@ def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User
         if found_vote:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"User {current_user.id} has already up voted post:[{pvote.post_id}]"
+                detail=f"User {current_user.id} has already up voted post:{pvote.post_id}"
             )
 
         # make new vote to Votes table
@@ -46,7 +46,7 @@ def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User
         if not found_vote:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Vote of user[{current_user.id}] for post[{pvote.post_id}] could not be found"
+                detail=f"Vote of user[{current_user.id}] for post:{pvote.post_id} could not be found"
             )
 
         # remove the entry from Votes table
