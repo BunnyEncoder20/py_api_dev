@@ -6,7 +6,6 @@ from app.database import get_db
 from app.schemas.vote import Votes_PyModel
 from app.schemas.user import User_PyModel
 from app.utils import oauth2
-from app.models import post
 from app.models.vote import Votes
 from app.models.post import Posts
 
