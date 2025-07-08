@@ -1,15 +1,20 @@
-from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional, Union
 from datetime import datetime
+from pydantic import BaseModel, EmailStr
 
 # Pydantic Model for Validation
-class register_user_PyModel(BaseModel):
+class User_PyModel(BaseModel):
+    id: int
+    email: EmailStr
+    password: str
+    created_at: datetime
+
+class Register_user_PyModel(BaseModel):
     email: EmailStr
     password: str
 
-class login_user_PyModel(BaseModel):
+class Login_user_PyModel(BaseModel):
     email: EmailStr
     password: str
 
-class user_token_PyModel(BaseModel):
+class User_token_PyModel(BaseModel):
     id: int

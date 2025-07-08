@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/login", response_model=response.Token_Reponse_PyModel)
-def login(pcred: user.login_user_PyModel, db: Session = Depends(get_db)):
+def login(pcred: user.Login_user_PyModel, db: Session = Depends(get_db)):
     """
     Authenticate a user and generate a JWT access token upon successful login.
     Args:

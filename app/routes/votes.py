@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 # Modular Imports
 from app.database import get_db
 from app.schemas.vote import Votes_PyModel
+from app.schemas.user import User_PyModel
 from app.utils import oauth2
 from app.models.vote import Votes
 
@@ -15,7 +16,8 @@ router = APIRouter(
 )
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User_PyModel = Depends(oauth2.get_current_user)):
+    # print(f"SERVER: Vote for postID:[{pvote.post_id}] received from user:[{current_user.id}]")
 
     # query for vote of user for post
     vote_query = db.query(Votes).filter(Votes.post_id == pvote.post_id, Votes.user_id == current_user.id)
