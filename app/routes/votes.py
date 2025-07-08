@@ -6,7 +6,9 @@ from app.database import get_db
 from app.schemas.vote import Votes_PyModel
 from app.schemas.user import User_PyModel
 from app.utils import oauth2
+from app.models import post
 from app.models.vote import Votes
+from app.models.post import Posts
 
 
 # Set route prefix
@@ -18,6 +20,14 @@ router = APIRouter(
 @router.post('/', status_code=status.HTTP_201_CREATED)
 def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User_PyModel = Depends(oauth2.get_current_user)):
     # print(f"SERVER: Vote for postID:[{pvote.post_id}] received from user:[{current_user.id}]")
+
+    # query for checking if post exists or not
+    found_post = db.query(Posts).filter(Posts.id == pvote.post_id).first()
+    if not found_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post:{pvote.post_id} does not exist"
+        )
 
     # query for vote of user for post
     vote_query = db.query(Votes).filter(Votes.post_id == pvote.post_id, Votes.user_id == current_user.id)
