@@ -7,10 +7,12 @@ from typing import List, Optional
 
 
 from app.database import get_db
+from app.routes import votes
 from app.schemas import response, post, user
 from app.models.vote import Votes as Votes_Table
 from app.models.post import Posts as Posts_Table
 from app.utils import oauth2
+from test.libregrtest import results
 
 '''------------------------------------------------------------------'''
 
@@ -20,7 +22,7 @@ router = APIRouter(
 )
 
 
-'''-------------- V2 APIs -------------'''
+'''--------------------------- V2 APIs ------------------------------'''
 
 @router.get("/", response_model=List[response.Posts_Votes_PyModel])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
@@ -64,13 +66,24 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, sea
     # print(results)
     return results
 
-# @router.get("/{pid}")
-@router.get("/{pid}", response_model=response.Posts_Votes_PyModel)
-def get_specific_post(pid: int, db: Session = Depends(get_db)):
-    '''retrieving a post by ID'''
+# This is here because FastAPI router will interpret /by as an int if /{pid} id before this
+# Rule of Thumb: Always Static Routes before Dynamic ones
+@router.get("/by", response_model=List[response.Posts_Votes_PyModel])
+def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
+    '''get all posts by user'''
 
-    print(f'SERVER: Fetching post with id:')
-    req_post = (
+    # Original query for list of posts
+    # print(f"Fetching all posts by User {current_user.id}")
+    # list_of_posts = (
+    #     db.query(
+    #         Posts_Table,
+    #         func.count(Votes_Table.post_id).label("votes")
+    #     )
+    #     .filter(Posts_Table.user_id == current_user.id).all()
+    # )
+
+    # Updated query with votes data
+    list_of_posts = (
         db.query(
             Posts_Table,
             func.count(Votes_Table.post_id).label("votes")
@@ -81,35 +94,16 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
             isouter=True
         )
         .group_by(Posts_Table.id)
-        .filter(Posts_Table.id == pid)
-        .first()
+        .filter(Posts_Table.user_id == current_user.id)
+        .all()
     )
 
-    if not req_post:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"The post with id:{pid} does not exist"
-        )
+    user_posts_results = [{
+        "post": post_obj,
+        "votes": votes_count
+    } for post_obj, votes_count in list_of_posts]
 
-    post, votes = (req_post)
-    return {
-        "post":post,
-        "votes":votes
-    }
-
-@router.get("/by", response_model=List[response.Posts_Votes_PyModel])
-def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
-    '''get all posts by user'''
-
-    print(f"Fetching all posts by User {current_user.id}")
-    list_of_posts = (
-        db.query(
-            Posts_Table,
-            func.count(Votes_Table.post_id).label("votes")
-        )
-        .filter(Posts_Table.user_id == current_user.id).all()
-    )
-    return list_of_posts
+    return user_posts_results
 
 @router.post("/makepost", response_model=response.Response_PyModel_V2)
 def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
@@ -133,6 +127,39 @@ def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_u
     db.refresh(new_post)    # retreive new entry (with auto gen fields like ID, created_at)
 
     return new_post
+
+# @router.get("/{pid}")
+@router.get("/{pid}", response_model=response.Posts_Votes_PyModel)
+def get_specific_post(pid: int, db: Session = Depends(get_db)):
+    '''retrieving a post by ID'''
+
+    print(f'SERVER: Fetching post with id:{pid}...')
+    req_post = (
+        db.query(
+            Posts_Table,
+            func.count(Votes_Table.post_id).label("votes")
+        )
+        .join(
+            Votes_Table,
+            Votes_Table.post_id == Posts_Table.id,
+            isouter=True
+        )
+        .group_by(Posts_Table.id)
+        .filter(Posts_Table.id == pid)
+        .first()
+    )
+
+    if not req_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id:{pid} does not exist"
+        )
+
+    post, votes_count = (req_post)
+    return {
+        "post":post,
+        "votes":votes_count
+    }
 
 @router.delete("/delpost/{pid}")
 def delete_post(pid: int, db: Session = Depends(get_db), curent_user: user.User_PyModel = Depends(oauth2.get_current_user)):
