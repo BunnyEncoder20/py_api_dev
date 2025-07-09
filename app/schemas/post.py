@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Union
-from datetime import datetime
+from pydantic import BaseModel
+from typing import List
 
 # Pydantic Model for Validation
 class Post_PyModel(BaseModel):
@@ -9,4 +8,3 @@ class Post_PyModel(BaseModel):
     content: str
     published: bool
     tags: List = []
-    
