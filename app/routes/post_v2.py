@@ -5,8 +5,9 @@ from sqlalchemy import or_
 from typing import List, Optional
 
 from app.database import get_db
+from app.models.vote import Votes
 from app.schemas import response, post, user
-from app.models.post import Posts
+from app.models.post import Posts as Posts_Table
 from app.utils import oauth2
 
 '''------------------------------------------------------------------'''
@@ -22,10 +23,12 @@ router = APIRouter(
 @router.get("/", response_model=List[response.Response_PyModel_V2])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     '''get all posts'''
-    data = db.query(Posts).filter(or_(
-            Posts.title.ilike(f'%{search}%'),       # making the search case insensitive
-            Posts.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
+    data = db.query(Posts_Table).filter(or_(
+            Posts_Table.title.ilike(f'%{search}%'),       # making the search case insensitive
+            Posts_Table.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
         )).limit(limit).offset(skip).all()
+
+    votes_data = db.query(Posts_Table).join(Votes)
 
     # sending res
     return data
@@ -36,7 +39,7 @@ def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyMo
     '''get all posts by user'''
 
     print(f"Fetching all posts by User {current_user.id}")
-    list_of_posts = db.query(Posts).filter(Posts.user_id == current_user.id).all()
+    list_of_posts = db.query(Posts_Table).filter(Posts_Table.user_id == current_user.id).all()
 
     return list_of_posts
 
@@ -44,7 +47,7 @@ def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyMo
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
 
-    req_post = db.query(Posts).filter(Posts.id == pid).first()
+    req_post = db.query(Posts_Table).filter(Posts_Table.id == pid).first()
 
     if not req_post:
         raise HTTPException(
@@ -71,7 +74,7 @@ def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_u
 
     # * Better way to insert the information by unpacking the dict
     print(f"User {current_user.id} is making a new post")
-    new_post = Posts(user_id=current_user.id, **ppost.dict())
+    new_post = Posts_Table(user_id=current_user.id, **ppost.dict())
 
     db.add(new_post)        # stage changes
     db.commit()             # commit change
@@ -84,7 +87,7 @@ def delete_post(pid: int, db: Session = Depends(get_db), curent_user: user.User_
     '''delete a post by ID'''
 
     # make init changes
-    del_query = db.query(Posts).filter(Posts.id == pid)
+    del_query = db.query(Posts_Table).filter(Posts_Table.id == pid)
     post = del_query.first()
 
     # if the post was not found
@@ -96,7 +99,7 @@ def delete_post(pid: int, db: Session = Depends(get_db), curent_user: user.User_
 
     print(f"INFO: \t User {curent_user.id} is deleting post {pid}")
 
-    # check if post is of user
+    # check if post is not of user
     if post.user_id != curent_user.id:
         print(f"ERR: \t  {curent_user.id} cannot delete post {pid} by {post.user_id}")
         raise HTTPException(
@@ -118,7 +121,7 @@ def delete_post(pid: int, db: Session = Depends(get_db), curent_user: user.User_
 def udpate_post(pid: int, ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
     '''Update a post by ID. Remember that PUT is used to replace the entire object/data'''
 
-    findpost_query = db.query(Posts).filter(Posts.id == pid)
+    findpost_query = db.query(Posts_Table).filter(Posts_Table.id == pid)
     post = findpost_query.first()
 
     # the post to be updated is not found
