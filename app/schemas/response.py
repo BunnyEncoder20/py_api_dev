@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime
 
@@ -8,8 +8,13 @@ class Response_PyModel(BaseModel):
     msg: Optional[str] = Field(default=None, description="Optional message string")
     data: Optional[dict] = Field(default=None, description="Optional data payload")
 
-    class Config:
-        orm_mode: True
+    # For Pydantic v1
+    # class Config:
+    #     orm_mode=True
+
+    # For Pydantic v2 onwards
+    model_config = ConfigDict(from_attributes=True)
+
 
 # Pydantic Model for returning user data
 class User_Response_PyModel(BaseModel):
@@ -17,13 +22,13 @@ class User_Response_PyModel(BaseModel):
     email: EmailStr
     # password: str
     created_at: datetime
-    
-    class Config:
-        orm_mode: True
-        
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 
 # Pydantic Model for returning only specified fields
-# * We can omit the fields , we do not want to send to the frontend / client
+# We can omit the fields , we do not want to send to the frontend / client
 class Response_PyModel_V2(BaseModel):
     # id: int
     title: str
@@ -33,9 +38,15 @@ class Response_PyModel_V2(BaseModel):
     created_at: datetime
     # user_id: int
     user: User_Response_PyModel     # this is the name of the Pydantic model of User resp
-    
-    class Config:
-        orm_mode: True
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Votes_PyModel(BaseModel):
+    posts: Response_PyModel_V2
+    votes: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token_Reponse_PyModel(BaseModel):
