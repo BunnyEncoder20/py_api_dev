@@ -42,9 +42,9 @@ class Response_PyModel_V2(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class Votes_PyModel(BaseModel):
-    posts: Response_PyModel_V2
-    votes: int
+class Posts_Votes_PyModel(BaseModel):
+    post: Response_PyModel_V2      # First Object is above response pymodel
+    votes: int                      # count of votes
 
     model_config = ConfigDict(from_attributes=True)
 

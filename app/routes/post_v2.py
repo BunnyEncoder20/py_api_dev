@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import func
 
 from typing import List, Optional
 
+
 from app.database import get_db
-from app.models.vote import Votes
 from app.schemas import response, post, user
+from app.models.vote import Votes as Votes_Table
 from app.models.post import Posts as Posts_Table
 from app.utils import oauth2
 
@@ -20,7 +22,7 @@ router = APIRouter(
 
 '''-------------- V2 APIs -------------'''
 
-@router.get("/", response_model=List[response.Response_PyModel_V2])
+@router.get("/", response_model=List[response.Posts_Votes_PyModel])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     '''get all posts'''
     data = db.query(Posts_Table).filter(or_(
@@ -28,10 +30,37 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, sea
             Posts_Table.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
         )).limit(limit).offset(skip).all()
 
-    votes_data = db.query(Posts_Table).join(Votes)
+    data_with_votes_count = (
+        db.query(
+            Posts_Table,
+            func.count(Votes_Table.post_id).label("votes")  # Counting(votes.post_ids) and renaming
+        )
+        .join(                                              # SQLALCHEMY's join by default is INNER join
+            Votes_Table,                                    # LEFT INNER join of Posts on Votes
+            Votes_Table.post_id == Posts_Table.id,          # matching the votes.posts_id to posts.id
+            isouter=True                                    # to make it OUTER join (cause that is what we want)
+        )
+        .group_by(
+            Posts_Table.id
+        )
+        .filter(or_(
+            Posts_Table.title.ilike(f'%{search}%'),
+            Posts_Table.content.ilike(f'%{search}%')
+        ))
+        .limit(limit)
+        .offset(skip)
+        .all()
+    )
 
-    # sending res
-    return data
+    results = [{
+        "post": post_obj,
+        "votes": vote_count
+    } for post_obj,vote_count in data_with_votes_count]
+
+
+    # sending back the results
+    # print(results)
+    return results
 
 
 @router.get("/by", response_model=List[response.Response_PyModel_V2])
