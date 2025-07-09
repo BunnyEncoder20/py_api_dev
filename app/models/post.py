@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 '''-----------------------'''
 from app.database import Base
 
+# NOTE: These are called ORM Models (hence they are under Models folder)
 class Posts(Base):
     __tablename__ = "posts_table_v2"
 
@@ -14,6 +15,6 @@ class Posts(Base):
     tags = Column(ARRAY(Text), server_default="{}")
     created_at = Column(TIMESTAMP(timezone=False), server_default=func.now(), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
-    
-    # automatically fetch the user through user_id. 
+
+    # automatically fetch the user through user_id.
     user = relationship("Users")            # Users is the name of the SqlAlchemy class, not the actual SQL table
