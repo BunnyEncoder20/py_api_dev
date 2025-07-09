@@ -25,10 +25,12 @@ router = APIRouter(
 @router.get("/", response_model=List[response.Posts_Votes_PyModel])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     '''get all posts'''
-    data = db.query(Posts_Table).filter(or_(
-            Posts_Table.title.ilike(f'%{search}%'),       # making the search case insensitive
-            Posts_Table.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
-        )).limit(limit).offset(skip).all()
+
+    # original query
+    # data = db.query(Posts_Table).filter(or_(
+    #         Posts_Table.title.ilike(f'%{search}%'),       # making the search case insensitive
+    #         Posts_Table.content.ilike(f"%{search}%")      # also so that there can be any char before and after key word
+    #     )).limit(limit).offset(skip).all()
 
     data_with_votes_count = (
         db.query(
@@ -62,21 +64,26 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, sea
     # print(results)
     return results
 
-
-@router.get("/by", response_model=List[response.Response_PyModel_V2])
-def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
-    '''get all posts by user'''
-
-    print(f"Fetching all posts by User {current_user.id}")
-    list_of_posts = db.query(Posts_Table).filter(Posts_Table.user_id == current_user.id).all()
-
-    return list_of_posts
-
-@router.get("/{pid}", response_model=response.Response_PyModel_V2)
+# @router.get("/{pid}")
+@router.get("/{pid}", response_model=response.Posts_Votes_PyModel)
 def get_specific_post(pid: int, db: Session = Depends(get_db)):
     '''retrieving a post by ID'''
 
-    req_post = db.query(Posts_Table).filter(Posts_Table.id == pid).first()
+    print(f'SERVER: Fetching post with id:')
+    req_post = (
+        db.query(
+            Posts_Table,
+            func.count(Votes_Table.post_id).label("votes")
+        )
+        .join(
+            Votes_Table,
+            Votes_Table.post_id == Posts_Table.id,
+            isouter=True
+        )
+        .group_by(Posts_Table.id)
+        .filter(Posts_Table.id == pid)
+        .first()
+    )
 
     if not req_post:
         raise HTTPException(
@@ -84,9 +91,25 @@ def get_specific_post(pid: int, db: Session = Depends(get_db)):
             detail=f"The post with id:{pid} does not exist"
         )
 
-    return req_post
+    post, votes = (req_post)
+    return {
+        "post":post,
+        "votes":votes
+    }
 
+@router.get("/by", response_model=List[response.Posts_Votes_PyModel])
+def get_posts_by_user(db:Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
+    '''get all posts by user'''
 
+    print(f"Fetching all posts by User {current_user.id}")
+    list_of_posts = (
+        db.query(
+            Posts_Table,
+            func.count(Votes_Table.post_id).label("votes")
+        )
+        .filter(Posts_Table.user_id == current_user.id).all()
+    )
+    return list_of_posts
 
 @router.post("/makepost", response_model=response.Response_PyModel_V2)
 def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_user: user.User_PyModel = Depends(oauth2.get_current_user)):
