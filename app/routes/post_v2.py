@@ -7,12 +7,10 @@ from typing import List, Optional
 
 
 from app.database import get_db
-from app.routes import votes
 from app.schemas import response, post, user
 from app.models.vote import Votes as Votes_Table
 from app.models.post import Posts as Posts_Table
 from app.utils import oauth2
-from test.libregrtest import results
 
 '''------------------------------------------------------------------'''
 
@@ -120,7 +118,7 @@ def make_post(ppost: post.Post_PyModel, db: Session = Depends(get_db), current_u
 
     # * Better way to insert the information by unpacking the dict
     print(f"User {current_user.id} is making a new post")
-    new_post = Posts_Table(user_id=current_user.id, **ppost.dict())
+    new_post = Posts_Table(user_id=current_user.id, **ppost.model_dump())
 
     db.add(new_post)        # stage changes
     db.commit()             # commit change
