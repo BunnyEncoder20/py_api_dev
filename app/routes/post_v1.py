@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 from random import randint
 from typing import List
 
-from app.database import get_db_connection, get_db
-from app.models.post import Posts
+from app.database import get_db_connection
 from app.schemas.response import Response_PyModel
 from app.schemas.post import Post_PyModel
 
@@ -44,22 +43,22 @@ def get_posts():
 # using path parameters
 @router.get("/{pid}", response_model=Response_PyModel)
 def get_specific_post(pid: int):
-    
+
     # executing SQL query on pg server
     cursor.execute("""
         SELECT * FROM posts_table
-        WHERE id = %s  
+        WHERE id = %s
     """, (str(pid),))    # Need the id to be an string to fit into query here. Also remember how to pass single value tuples.
-    
+
     # Fetch query results from pg server
     req_post = cursor.fetchone()
-    
+
     if not req_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post {pid} could not be found"
         )
-    
+
     return {
         "status_code": status.HTTP_200_OK ,
         "msg": "Post fetched successfully",
@@ -77,7 +76,7 @@ def make_post(post: Post_PyModel):
     """, (post.title, post.content, post.published, post.tags))
     #!!! NEVER USE f"" strings for executing SQL commands. They expose our database to SQL injection attacks, if the user input would contain malicious SQL cmds
     #!!! Python does not escape the values safely like the psycopg2 parameterized %s syntax does.
-    
+
     # fetch the STAGED results from the server
     new_post = cursor.fetchone()
 
@@ -98,19 +97,19 @@ def delete_post(pid: int):
         WHERE id = %s
         RETURNING *
     """, (str(pid),))
-    
+
     # fetching results from pg server
     deleted_post = cursor.fetchone()
 
     # Commit changes to DB
     conn.commit()
-    
+
     if not deleted_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The post with id:{pid} does not exist"
         )
-    
+
     # with status code of 203, we cannot send anything back using return dict
     # hence we send a Response item, but otherwise, send a normal return dict
     return {
@@ -118,7 +117,7 @@ def delete_post(pid: int):
         "msg": f"post {pid} was deleted successfully",
         "data": deleted_post
     }
-    
+
 @router.put("/updatepost/{pid}", response_model=Response_PyModel)
 def udpate_post(pid: int, ppost: Post_PyModel):
     # execute sql on pg server side
@@ -131,17 +130,17 @@ def udpate_post(pid: int, ppost: Post_PyModel):
 
     # fetch the results back from server
     updated_post = cursor.fetchone()
-    
-    # commit changes to DB 
+
+    # commit changes to DB
     conn.commit()
-    
+
     # the post to be updated is not found
     if not updated_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The post with id:{pid} does not exist"
         )
-    
+
     return {
         "status_code": status.HTTP_200_OK,
         "msg": f"post {pid} was updated successfully",

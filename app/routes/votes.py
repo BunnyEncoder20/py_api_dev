@@ -6,8 +6,8 @@ from app.database import get_db
 from app.schemas.vote import Votes_PyModel
 from app.schemas.user import User_PyModel
 from app.utils import oauth2
-from app.models.vote import Votes
-from app.models.post import Posts
+from app.models.vote import Votes as Votes_Table
+from app.models.post import Posts as Posts_Table
 
 
 # Set route prefix
@@ -21,7 +21,7 @@ def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User
     # print(f"SERVER: Vote for postID:[{pvote.post_id}] received from user:[{current_user.id}]")
 
     # query for checking if post exists or not
-    found_post = db.query(Posts).filter(Posts.id == pvote.post_id).first()
+    found_post = db.query(Posts_Table).filter(Posts_Table.id == pvote.post_id).first()
     if not found_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -29,7 +29,7 @@ def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User
         )
 
     # query for vote of user for post
-    vote_query = db.query(Votes).filter(Votes.post_id == pvote.post_id, Votes.user_id == current_user.id)
+    vote_query = db.query(Votes_Table).filter(Votes_Table.post_id == pvote.post_id, Votes_Table.user_id == current_user.id)
     found_vote = vote_query.first()
 
     # according to vote direction
@@ -43,7 +43,7 @@ def vote(pvote: Votes_PyModel, db: Session = Depends(get_db), current_user: User
             )
 
         # make new vote to Votes table
-        new_vote = Votes(post_id=pvote.post_id, user_id=current_user.id)
+        new_vote = Votes_Table(post_id=pvote.post_id, user_id=current_user.id)
         db.add(new_vote)
         db.commit()
         return {

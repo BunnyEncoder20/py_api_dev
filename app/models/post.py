@@ -6,7 +6,7 @@ from app.database import Base
 
 # NOTE: These are called ORM Models (hence they are under Models folder)
 class Posts(Base):
-    __tablename__ = "posts_table_v2"
+    __tablename__ = "posts"   # previous posts_table_v2
 
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String, nullable=False)
