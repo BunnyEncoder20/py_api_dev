@@ -14,6 +14,13 @@
 
 - Please visit the [FastAPI Documentations](https://fastapi.tiangolo.com/tutorial/first-steps/#what-is-openapi-for) Page.
 - It literally has everything, from setting up venvs to everything to write robost APIs in pyhton
+- How to activate and deactivate _virtual env_ which making python projects:
+```python
+source .venv/bin/activate
+```
+```python
+deactivate
+```
 
 ---
 
@@ -61,7 +68,45 @@
         ```
         4. We can specify which cols of table by using the tablename.colname (tablename.* for all columns)
 
+3. Alembic
+    1. SqlAlchemy Limitations
+        - When it comes to upgrading our tables, SqlAlchemy cannot change already made tables and cols
+        - This is becasue if the table already exists, it'll not add any new changes to the tables casue it is already there. Hence we cannot change or add new cols
+        - Till now I was dropping the old tables and restarting the server to make changes / adding cols to a table
+    2. Alembic - DB Migration Tool
+        - Why DB migration tool ?
+            - Developers can track changes to code and rollback code easily with GIT. Why can't we do the same for database models/tables
+            - Database migrations allow us to incrementally track changes to database schema and rollback changes to any point in time
+            - We will use a tool called **Alembic** to make changes to our database
+            - **Alembic** can also automatically pull database models from Sqlalchemy and generate the proper tables
+        - Intigration & Setting up
+            1. Install Alembic
+            2. Init Alembic dir: this will create the "alembic" dir and alembic.ini file. ensure these are outside the app dir (in the root of project)
+            ```python
+            (.venv) alembic init alembic
+            ```
+            3. Becasue we want Alembic to work with SqlAlchemy,
+                1. we need to give it access to the Base object.
+                2. Also it needs access to all ORM models, so we import the models module.
+                3. For makingthe DB url, we need the settings class instance from the config file also.
+            4. Also these are imported into the alembic/env.py file:
+            ```python
+            from app.database import Base
+            from app import models
+            from app.cofig import settings
 
+            # overriding the sqlalchemy.url from alembic.ini file here
+            config.set_main_option(
+                "sqlalchemy.url", f"postgresql+psycopg2://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOSTNAME}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}"
+            )
+            ```
+        - Usage (commands entered )
+            1. Creating a new revision:
+                - kinda like a git commit (use a -m for msg)
+                ```python
+                alembic revision -m "create posts table"
+                ```
+                - Generates the versions folder (if not there) and create a new revision (change) under it
 
 
 ---

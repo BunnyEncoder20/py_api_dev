@@ -1,10 +1,11 @@
-import os
 import time
-import psycopg2     # pgsql direct driver 
+import psycopg2     # pgsql direct driver
 from psycopg2.extras import RealDictCursor
 
-# cofig for env variables 
+# cofig for env variables
 from app.config import settings
+
+
 '''------------------------------------------------------------------'''
 
 
@@ -40,14 +41,15 @@ def get_db_connection():
 # Way 2: Using SqlAlchemy ORM
 from sqlalchemy import create_engine        # Sqlalchemy is a ORM (abstract layer between FastAPI and PGSQL) but still needs a database driver
 from sqlalchemy.orm import sessionmaker, declarative_base
+
 DATABASE_URL = f"postgresql://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOSTNAME}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}"
 
+Base = declarative_base()
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-def get_db() :                                          
+def get_db() :
     db = SessionLocal()
     try:
-        yield db    
+        yield db
     finally:
         db.close()

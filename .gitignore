@@ -7,3 +7,6 @@
 # Ignore all __pycache__ folders and pyc files recursively
 **/__pycache__/
 **/*.pyc
+
+#Ignore all the SQL data files I'm backing up
+**/*.csv
