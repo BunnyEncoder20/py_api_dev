@@ -7,6 +7,7 @@
 - **Fast API**: Cause it's build keeping api development in mind and also has a auto documentation feature (becasue it is important to document how an api works)
 - **Postgres**: SQL database (almost all the same)
 - **SQL Alchemy**: ORM, most standard one for python frameworks, most popular
+- **Alembic**: Database Migration Tool used to make revisions (commits) for SQL Database Tables
 
 ---
 
@@ -100,13 +101,42 @@ deactivate
                 "sqlalchemy.url", f"postgresql+psycopg2://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOSTNAME}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}"
             )
             ```
-        - Usage (commands entered )
-            1. Creating a new revision:
-                - kinda like a git commit (use a -m for msg)
-                ```python
-                alembic revision -m "create posts table"
-                ```
-                - Generates the versions folder (if not there) and create a new revision (change) under it
+    3. Usage | ref: [Alembic Documentations](https://alembic.sqlalchemy.org/en/latest/api/ddl.html)
+        1. Creating a new revision:
+            - kinda like a git commit (use a -m for msg)
+            - commands entered in teminal)
+            ```python
+            alembic revision -m "create posts table"
+            ```
+            - Generates the versions folder (if not there) and create a new revision (change) under it
+            - In the revision file , we have to MANUALLY add the logic for each change to the tables/cols. Example given:
+            ```python
+            def upgrade() -> None:
+                """Upgrade schema."""
+                op.create_table('Posts',
+                    sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
+                    sa.Column('title', sa.String(), nullable=False)
+                )
+
+
+            def downgrade() -> None:
+                """Downgrade schema."""
+                op.drop_table('Posts')
+            ```
+        2. Checking Current revision of Database
+            - cmd in terminanl:
+            ```python
+            alembic current
+            ```
+
+        3. Upgrade cmd
+            - cmd to update (goto) a specified revision (via revision number present in revision file) of database.
+            - kinda runs the code within
+            ```python
+            alembic upgrade 0e552f25a5a8
+            ```
+            - If it's first table created through alembic, there will be an extra table called alembic_version which stores all the revisions (do not touch that)
+
 
 
 ---
