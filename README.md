@@ -170,6 +170,7 @@ deactivate
             alembic downgrade <down_revision ID>
             alembic downgrade -1
             alembic downgrade -2
+            alembic downgrade base          # all the way down to base
             ```
 
 
