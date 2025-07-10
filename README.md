@@ -103,13 +103,14 @@ deactivate
             ```
     3. Usage | ref: [Alembic Documentations](https://alembic.sqlalchemy.org/en/latest/api/ddl.html)
         1. Creating a new revision:
-            - kinda like a git commit (use a -m for msg)
+            - kinda like a making a change file (use a -m for msg)
             - commands entered in teminal)
-            ```python
+            ```cmd
             alembic revision -m "create posts table"
             ```
             - Generates the versions folder (if not there) and create a new revision (change) under it
             - In the revision file , we have to MANUALLY add the logic for each change to the tables/cols. Example given:
+            - there has to be a upgrade: for adding changes and a Downgrade func for removing the above changes
             ```python
             def upgrade() -> None:
                 """Upgrade schema."""
@@ -125,26 +126,64 @@ deactivate
             ```
         2. Checking Current revision of Database
             - cmd in terminanl:
-            ```python
+            ```cmd
             alembic current
             ```
 
         3. Upgrade cmd
             - cmd to update (goto) a specified revision (via revision number present in revision file) of database.
-            - kinda runs the code within
-            ```python
-            alembic upgrade 0e552f25a5a8
+            - kinda like a commit in git
+            ```cmd
+            alembic upgrade <revision ID>
             ```
             - If it's first table created through alembic, there will be an extra table called alembic_version which stores all the revisions (do not touch that)
+            - New for every change we make to the Table, we can make it's respectve revision: Eg: adding a col to posts table:
+            ```cmd
+            alembic revision -m "adds content col to posts table"
+            ```
+            - after which we can edit it's revision file: (notice this one will have a down_revision field also)
+            ```python
+            def upgrade() -> None:
+                """Upgrade schema."""
+                op.add_column(
+                    'Posts',
+                    sa.Column('content', sa.String(), nullable=False)
+                )
 
+
+            def downgrade() -> None:
+                """Downgrade schema."""
+                op.drop_column('Posts', 'content')
+            ```
+
+        4. heads cmd: displays the lastest revision made (aka head)
+        ```cmd
+        alembic head            # displays the head
+        alembic upgrade head    # upgrades (commits) the head revision (latest)
+        ```
+
+        5. downgrade cmd
+            - used to rollback the changes made during a revision
+            - after the keyword, enter the down_revision ID for revision (change)
+            - or we can add a number (Eg: -1 will take one revision back, -2 will take 2 revisions back)
+            ```cmd
+            alembic downgrade <down_revision ID>
+            alembic downgrade -1
+            alembic downgrade -2
+            ```
 
 
 ---
 
-### Important Commands
+## Important Commands
 
 1. Starting the API server
 
 ```text
 uvicorn app.main:app --reload
+```
+
+2. Activating venv (mac)
+```cmd
+source .venv/bin/activate
 ```
