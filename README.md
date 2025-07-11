@@ -175,6 +175,13 @@ deactivate
             alembic downgrade base          # all the way down to base
             ```
 
+        6. Do check out the revision files of this project to see how to actually write the upgrade and downgrade logic, it is NOT the same as writing the Pydantic ORM models.
+
+4. Fixing the CORS problem in FastAPI
+    - We use the CORSMiddleware by:
+        1. Importing it
+        2. creating a list of allowed origins
+        3. Add it as a "middleware" to your FastAPI app
 
 ---
 
