@@ -197,3 +197,13 @@ uvicorn app.main:app --reload
 ```cmd
 source .venv/bin/activate
 ```
+
+3. Making requirements.txt file (to help install project with exact packages and their versions)
+```cmd
+uv pip freeze > requirements.txt
+```
+
+4. To use the requirements file to install all the dependencies of the project:
+```cmd
+pip install -r requirements.txt
+```
