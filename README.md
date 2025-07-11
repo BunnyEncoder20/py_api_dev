@@ -34,7 +34,7 @@ deactivate
 
 ## Things Learned
 
-1. Central Env variable loading
+1. **Central Env variable loading**
 
    - done using config file using pydantic-settings package:BaseSettings
    - Introduces:
@@ -48,7 +48,7 @@ deactivate
     env_variable = settings.ENV_NAME
     ```
 
-2. Voting / Likes systems
+2. **Voting / Likes systems**
    1. DB Properties
       1. User should be able to like a post once only
       2. For this we would need 2 cols atleast [postID, userID] and each combination of these would need to be unique
@@ -69,12 +69,12 @@ deactivate
         ```
         4. We can specify which cols of table by using the tablename.colname (tablename.* for all columns)
 
-3. Alembic
+3. **Alembic - DB Migration Tool**
     1. SqlAlchemy Limitations
         - When it comes to upgrading our tables, SqlAlchemy cannot change already made tables and cols
         - This is becasue if the table already exists, it'll not add any new changes to the tables casue it is already there. Hence we cannot change or add new cols
         - Till now I was dropping the old tables and restarting the server to make changes / adding cols to a table
-    2. Alembic - DB Migration Tool
+    2. Where Alembic comes into picture
         - Why DB migration tool ?
             - Developers can track changes to code and rollback code easily with GIT. Why can't we do the same for database models/tables
             - Database migrations allow us to incrementally track changes to database schema and rollback changes to any point in time
@@ -135,6 +135,8 @@ deactivate
             - kinda like a commit in git
             ```cmd
             alembic upgrade <revision ID>
+            alembic upgrade +1
+            alembic upgrade +2
             ```
             - If it's first table created through alembic, there will be an extra table called alembic_version which stores all the revisions (do not touch that)
             - New for every change we make to the Table, we can make it's respectve revision: Eg: adding a col to posts table:
