@@ -1,6 +1,6 @@
 # Need to give Alembic access to SqlAlchemy ORM models
 from app.database import Base
-from app import models          # this loads all models into Base.metadata so that alembic has access to them
+# from app import models          # this loads all models into Base.metadata so that alembic has access to them
 from app.config import settings # for the db url env variables
 
 from logging.config import fileConfig
