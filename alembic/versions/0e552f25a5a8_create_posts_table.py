@@ -27,7 +27,6 @@ def upgrade() -> None:
         sa.Column('published', sa.Boolean(), server_default=sa.text('TRUE'), nullable=False),
         sa.Column('tags', sa.ARRAY(sa.Text), server_default=sa.text("ARRAY[]::text[]")),
         sa.Column('created_at', sa.TIMESTAMP(timezone=False), server_deafult=sa.text('NOW()'), nullable=False),
-        sa.Column('user_id', sa.Integer(), sa.ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
     )
 
 
