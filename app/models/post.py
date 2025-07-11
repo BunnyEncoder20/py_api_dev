@@ -11,10 +11,10 @@ class Posts(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
-    published = Column(Boolean, server_default=expression.true())        # by default nullable = True
+    published = Column(Boolean, server_default=expression.false(), nullable=False)        # by default nullable = True
     tags = Column(ARRAY(Text), server_default="{}")
-    created_at = Column(TIMESTAMP(timezone=False), server_default=func.now(), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     # automatically fetch the user through user_id.
     user = relationship("Users")            # Users is the name of the SqlAlchemy class, not the actual SQL table
