@@ -5,9 +5,11 @@
 ## Tech Stack
 
 - **Fast API**: Cause it's build keeping api development in mind and also has a auto documentation feature (becasue it is important to document how an api works)
+- **Oauth2**: JWT and OAuth for authentication of users
 - **Postgres**: SQL database (almost all the same)
 - **SQL Alchemy**: ORM, most standard one for python frameworks, most popular
 - **Alembic**: Database Migration Tool used to make revisions (commits) for SQL Database Tables
+- **Docker**:
 
 ---
 
@@ -207,3 +209,8 @@ uv pip freeze > requirements.txt
 ```cmd
 pip install -r requirements.txt
 ```
+
+
+### TimeStamps
+1. Docker - 2:56:08
+2. Testing - 3:44:46
