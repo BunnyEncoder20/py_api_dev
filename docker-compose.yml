@@ -1,0 +1,18 @@
+# version: "3" # version of docker to use, not needed in compose v2+
+services:
+    service:
+        # build the image from (location of Dockerfile)
+        build: .
+
+        # ports to be opened
+        ports:
+            # - <port on localhost>:<port on container>
+            - 8000:8000
+
+        # specifying env variables
+        # env_file:
+        #     - env1=val1
+        #     - env2=val2
+        #     - env3=val3
+        env_file:
+            - ./.env

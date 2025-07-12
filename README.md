@@ -185,6 +185,25 @@ deactivate
         2. creating a list of allowed origins
         3. Add it as a "middleware" to your FastAPI app
 
+5. Dockerizing our app
+    1. We start by building a custom image. We can use the Official Python image as a base image in the file:
+    ```cmd
+    Dockerfile
+    ```
+    2. Run to build cmd to build the docker custom image file for our app (. at end location of Dockerfile):
+    ```cmd
+    docker build -tag fastapi_app_image .
+    ```
+    3.Instead of using Docker run, we will use Docker compose cause it makes it way easier (by putting all cmds and flags into a file) for spinning up our images and tearing them down. Make a file named:
+    ```cmd
+    docker-compose.yml
+    ```
+    4. After writing the code into the `docker-compose.yml` file, we can spin up the image by cmd (-d = detach, runs the containers in background):
+    ```cmd
+    docker-compose up -d
+    ```
+
+
 ---
 
 ## Important Commands
@@ -210,7 +229,12 @@ uv pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
+5. Building a docker image (ensure you have made the Dockerfile beforehand in root of project, finaly . represents where the Dockerfile is)
+```cmd
+docker build -t fastapi_app_image .
+```
 
-### TimeStamps
-1. Docker - 2:56:08
-2. Testing - 3:44:46
+6. Scanning for docker images
+```cmd
+docker image ls
+```
