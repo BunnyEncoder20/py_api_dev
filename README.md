@@ -206,6 +206,36 @@ deactivate
     - Once the containers are running, we can access useful features like logs and executable terminal right from the Docker app.
     - Synced local project dir and comtainer project dir by adding a **binding volumne**
 
+7. Start Scripts
+    - There might be a lot of commands which are needed to be run before starting our FastAPI server. Eg: running all alembic migrations to make the required tables of our DB
+    - Hence we include a start script which are run all of our project starting commands in one place
+    - Instead of chaining everything to one command in the docker-compose file, It is much easier to read, comment and expand. Eg:
+    ```start.sh
+    #!/bin/bash
+
+    # Wait until DB is ready (optional)
+    echo "[Server] ⏳ Waiting for DB to be ready..."
+    sleep 3
+
+    # Run Alembic migrations
+    echo "[Alembic] ⬆️ Running migrations..."
+    alembic upgrade head
+
+    # Start the server
+    echo "[Uvicorn] 🚀 Starting FastAPI server..."
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ```
+    - Make it an executable:
+    ```cmd
+    chmod +x start.sh
+    ```
+    - Finally add the command into the api_service in docker-compose file to run this start script:
+    ```docker-compose.yml
+    command: ["./start.sh"]
+    ```
+
+
+
 
 ---
 
