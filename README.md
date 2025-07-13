@@ -202,6 +202,9 @@ deactivate
     ```cmd
     docker-compose up -d
     ```
+6. Docker Desktop App
+    - Once the containers are running, we can access useful features like logs and executable terminal right from the Docker app.
+    - Synced local project dir and comtainer project dir by adding a **binding volumne**
 
 
 ---

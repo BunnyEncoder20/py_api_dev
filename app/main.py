@@ -41,7 +41,7 @@ app.add_middleware(
 # Generic Path operation (routes)
 @app.get("/")
 async def root():
-    return {"status_code": status.HTTP_200_OK , "msg": "Hellow World"}
+    return {"status_code": status.HTTP_200_OK , "msg": "Hello World"}
 
 
 

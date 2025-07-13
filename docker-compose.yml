@@ -1,6 +1,6 @@
 # version: "3" # version of docker to use, not needed in compose v2+
 
-#volumes
+# volumes
 volumes:
     pgdb_vol:
 
@@ -9,6 +9,10 @@ services:
     api_service:
         # build the image from (location of Dockerfile)
         build: .
+
+        # containers which should start before this service
+        depends_on:
+            - pgdb_service
 
         # ports to be opened
         ports:
@@ -24,6 +28,15 @@ services:
             - ./.env
         environment:
             DATABASE_HOSTNAME: pgdb_service # directly access the PostgreSQL within the container
+
+        # loading a bind mount (synced dirs project dir (local) and project dir (container)
+        volumes:
+            - ./:/usr/src/FastAPI_app:ro
+
+        # overridding Dockerfile start cmd to add --reload flag
+        # So that FastAPI app is reloaded everytime, changes are seen
+        # in synced dir
+        command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
     # service to run postgre db
     pgdb_service:
