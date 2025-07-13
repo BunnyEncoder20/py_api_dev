@@ -271,3 +271,9 @@ docker build -t fastapi_app_image .
 ```cmd
 docker image ls
 ```
+
+7. If server already running (port occupied)
+```cmd
+lsof -i :8000
+kill -9 <PID>
+```
