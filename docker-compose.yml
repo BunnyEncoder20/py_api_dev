@@ -1,6 +1,12 @@
 # version: "3" # version of docker to use, not needed in compose v2+
+
+#volumes
+volumes:
+    pgdb_vol:
+
+# service
 services:
-    service:
+    api_service:
         # build the image from (location of Dockerfile)
         build: .
 
@@ -10,9 +16,23 @@ services:
             - 8000:8000
 
         # specifying env variables
-        # env_file:
+        # environment:
         #     - env1=val1
         #     - env2=val2
         #     - env3=val3
         env_file:
             - ./.env
+        environment:
+            DATABASE_HOSTNAME: pgdb_service # directly access the PostgreSQL within the container
+
+    # service to run postgre db
+    pgdb_service:
+        image: postgres
+        environment:
+            - POSTGRES_USER=${DATABASE_USERNAME}
+            - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+            - POSTGRES_DB=${DATABASE_NAME}
+
+        # volumes will store the data even after the comtainer is killed
+        volumes:
+            - pgdb_vol:/var/lib/postgresql/data
