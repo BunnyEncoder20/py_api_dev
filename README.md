@@ -179,6 +179,12 @@ deactivate
 
         6. Do check out the revision files of this project to see how to actually write the upgrade and downgrade logic, it is NOT the same as writing the Pydantic ORM models.
 
+        7. Autogen Upgrades and Downgrades
+            - we can auto generate the upgrade and downgrade code for the versions:
+            ```zsh
+            alembic revision --autogenerate -m "autogen rev1: make table"
+            ```
+
 4. Fixing the CORS problem in FastAPI
     - We use the CORSMiddleware by:
         1. Importing it
